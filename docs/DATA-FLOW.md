@@ -268,6 +268,7 @@ Use this checklist to track your progress. All items must be completed and passi
 - [ ] Shows success message after publishing
 - [ ] Handles errors gracefully
 
+
 #### Feed Page (`app/feed/page.js`)
 - [ ] Page file exists in `app/feed/`
 - [ ] Fetches feed from GET `/api/feed` endpoint
@@ -412,48 +413,12 @@ Use this checklist to track your progress. All items must be completed and passi
 - Neon.com account (free tier)
 - OpenAI API key with DALL·E 2 access
 
-### 2. Clone and Install
-```bash
-git clone <your-github-classroom-repo>
-cd <repo-name>
-pnpm install
-```
-
-### 3. Environment Configuration
-```bash
-# Copy example env file
-cp .env.example .env
 
 # Edit .env and add your credentials:
 DATABASE_URL='postgresql://user:password@host/database?sslmode=require'
 OPENAI_API_KEY='sk-...'
 ```
 
-### 4. Database Setup (TS.3.3)
-```bash
-# Generate Prisma Client
-npx prisma generate
-
-# Create and apply migration
-npx prisma migrate dev --name init
-
-# Optional: Open Prisma Studio to view data
-npx prisma studio
-```
-
-### 5. Run Development Server
-```bash
-pnpm dev
-# Open http://localhost:3000
-```
-
-### 6. Run Tests
-```bash
-pnpm test              # Run all tests
-pnpm test:watch        # Run in watch mode
-```
-
----
 
 ## Grading Rubric (100 Points)
 
@@ -484,39 +449,6 @@ npx prisma generate
 # Restart your dev server after generating
 ```
 
-### Issue: Database connection errors
-**Solution:**
-- Check DATABASE_URL in .env is correct
-- Ensure connection string includes `?sslmode=require`
-- Verify Neon database is active (not hibernated)
-- Check if using Pool adapter (not Client)
-
-### Issue: OpenAI API errors
-**Solution:**
-- Verify OPENAI_API_KEY is set in .env
-- Check API key has DALL·E 2 access
-- Ensure account has credits available
-- Check for rate limiting (wait and retry)
-
-### Issue: Tests timing out
-**Solution:**
-- Increase timeout in vitest.config.js (hookTimeout: 60000)
-- Verify DATABASE_URL is accessible from test environment
-- Check if using Pool adapter in test setup
-- Ensure .env file is in project root
-
-### Issue: Migration fails
-**Solution:**
-```bash
-# Reset database (WARNING: deletes all data)
-npx prisma migrate reset
-
-# Create new migration
-npx prisma migrate dev --name init
-```
-
----
-
 ## Resources
 
 - [Prisma Documentation](https://www.prisma.io/docs)
@@ -531,23 +463,14 @@ npx prisma migrate dev --name init
 
 ## Submission Checklist
 
-Before submitting, verify:
-- [ ] All dependencies installed (`pnpm install`)
-- [ ] DATABASE_URL set in .env
-- [ ] OPENAI_API_KEY set in .env
-- [ ] Prisma Client generated (`npx prisma generate`)
-- [ ] Migrations applied (`npx prisma migrate dev`)
-- [ ] All 55+ tests pass (`pnpm test`)
-- [ ] No test warnings or errors
-- [ ] All 4 API endpoints working
-- [ ] Frontend pages working (Generate & Feed)
-- [ ] Architecture diagram created
-- [ ] Data flow documentation written
-- [ ] API documentation complete
-- [ ] Code committed to GitHub
-- [ ] README.md updated with your implementation details
+npm add next@16.1.1 react@19.2.3 react-dom@19.2.3 \
+@prisma/client@^7.2.0 \
+@neondatabase/serverless@^0.9.0 \
+@prisma/adapter-neon@^7.2.0 \
+openai@^4.25.0
 
----
+npm add -D prisma@^7.2.0 ws@^8.18.0 vitest@4.0.16 @types/node@^20.11.0
+
 
 ## License
 
