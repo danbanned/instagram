@@ -552,3 +552,52 @@ Before submitting, verify:
 ## License
 
 This is an educational project for technical skills assessment (TS.3.3 & TS.3.4).
+
+
+## 🔧 Key Name Changes & Usage
+
+### 1. **Prisma Configuration**
+- **File**: `prisma.config.js` (not `.ts`)
+- **Adapter**: Uses `@prisma/adapter-neon@7.2.0`
+- **WebSocket**: Configured with `ws` package for Node.js compatibility
+- **Export**: Default export of PrismaClient instance
+
+### 2. **Environment Variables**
+```env
+DATABASE_URL="postgresql://user:pass@neon-host/db?sslmode=require"
+OPENAI_API_KEY="sk-..."
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+
+instagram/
+├── app/
+│   ├── layout.js                 # Root layout with navigation
+│   ├── page.js                   # Home page (Generate images)
+│   ├── globals.css              # Global styles
+│   ├── feed/
+│   │   └── page.js              # Feed page
+│   └── api/
+│       ├── generate/
+│       │   └── route.js         # POST /api/generate
+│       ├── publish/
+│       │   └── route.js         # POST /api/publish
+│       └── feed/
+│           └── route.js         # GET & PUT /api/feed
+├── prisma/
+│   ├── schema.prisma            # Database schema
+│   ├── config.js               # Prisma + Neon configuration
+│   ├── seed.js                 # Database seeding script
+│   └── migrations/
+│       └── 20250101000000_init/
+│           └── migration.sql    # Initial migration
+├── docs/
+│   ├── API.md                  # API documentation
+│   ├── DATA-FLOW.md            # Data flow documentation
+│   └── QUICK-START.md          # Quick start guide
+├── public/                     # Static assets
+├── .env.example               # Environment template
+├── .gitignore                 # Git ignore rules
+├── package.json               # Dependencies and scripts
+├── setup-prisma.js            # Prisma setup script
+├── setup.sh                   # Complete setup script
+└── README.md                  # Project documentation
