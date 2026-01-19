@@ -1,119 +1,57 @@
-const prisma = require('../../../prisma/config.js');
+import { NextResponse } from "next/server";
 
-export async function GET(request) {
+export async function POST(req) {
   try {
-    const { searchParams } = new URL(request.url);
-    let page = parseInt(searchParams.get('page')) || 1;
-    let limit = parseInt(searchParams.get('limit')) || 10;
+    console.log("🔥 HF image generate endpoint hit");
 
-    // Validation
-    if (page < 1 || isNaN(page)) {
-      return Response.json(
-        { error: 'page must be a positive integer' },
+    const { prompt } = await req.json();
+
+    if (!prompt || typeof prompt !== "string") {
+      return NextResponse.json(
+        { error: "Prompt is required" },
         { status: 400 }
       );
     }
 
-    if (limit < 1 || isNaN(limit)) {
-      return Response.json(
-        { error: 'limit must be a positive integer' },
-        { status: 400 }
-      );
-    }
+    console.log("📝 Prompt:", prompt);
 
-    // Cap limit at 50
-    limit = Math.min(limit, 50);
-
-    const skip = (page - 1) * limit;
-
-    // Get images with pagination
-    const [images, total] = await Promise.all([
-      prisma.publishedImage.findMany({
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.publishedImage.count(),
-    ]);
-
-    const totalPages = Math.ceil(total / limit);
-
-    return Response.json({
-      images,
-      total,
-      page,
-      totalPages,
-    });
-
-  } catch (error) {
-    console.error('Database error:', error);
-    
-    return Response.json(
-      { error: 'Failed to fetch feed' },
-      { status: 500 }
+    const response = await fetch(
+      "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          options: { wait_for_model: true },
+        }),
+      }
     );
-  }
-}
 
-export async function PUT(request) {
-  try {
-    const body = await request.json();
-    const { id, hearts } = body;
-
-    // Validation
-    if (id === undefined || id === null) {
-      return Response.json(
-        { error: 'id is required' },
-        { status: 400 }
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("❌ HF error response:", err);
+      return NextResponse.json(
+        { error: "Hugging Face generation failed", details: err },
+        { status: 500 }
       );
     }
 
-    if (hearts === undefined || hearts === null) {
-      return Response.json(
-        { error: 'hearts is required' },
-        { status: 400 }
-      );
-    }
+    const imageBuffer = await response.arrayBuffer();
 
-    if (typeof id !== 'number' || id < 1) {
-      return Response.json(
-        { error: 'id must be a positive number' },
-        { status: 400 }
-      );
-    }
-
-    if (typeof hearts !== 'number' || hearts < 0) {
-      return Response.json(
-        { error: 'hearts must be a non-negative number' },
-        { status: 400 }
-      );
-    }
-
-    // Check if image exists
-    const existingImage = await prisma.publishedImage.findUnique({
-      where: { id },
+    return new NextResponse(imageBuffer, {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "no-store",
+      },
     });
-
-    if (!existingImage) {
-      return Response.json(
-        { error: 'Image not found' },
-        { status: 404 }
-      );
-    }
-
-    // Update hearts
-    const updatedImage = await prisma.publishedImage.update({
-      where: { id },
-      data: { hearts },
-    });
-
-    return Response.json(updatedImage);
 
   } catch (error) {
-    console.error('Database error:', error);
-    
-    return Response.json(
-      { error: 'Failed to update hearts' },
+    console.error("❌ Image generation error:", error);
+    return NextResponse.json(
+      { error: "Image generation failed" },
       { status: 500 }
     );
   }
