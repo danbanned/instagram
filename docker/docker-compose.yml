@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:7
+    container_name: ig-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  server:
+    build:
+      context: ../server
+      dockerfile: ../docker/server.Dockerfile
+    env_file:
+      - ../server/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    volumes:
+      - ../server:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ../client
+      dockerfile: ../docker/client.Dockerfile
+    env_file:
+      - ../client/.env
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    volumes:
+      - ../client:/app
+      - /app/node_modules
+
+volumes:
+  mongo_data:
