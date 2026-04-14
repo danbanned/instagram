@@ -1,17 +1,12 @@
 const Notification = require('../models/Notification');
 
 async function getNotifications(req, res) {
-  const notifications = await Notification.find({ recipient: req.user._id })
-    .populate('sender', 'username avatarUrl')
-    .populate('post', 'mediaUrl')
-    .sort({ createdAt: -1 })
-    .limit(100);
-
+  const notifications = await Notification.findByRecipient(req.user.id);
   res.json(notifications);
 }
 
 async function markRead(req, res) {
-  await Notification.updateMany({ recipient: req.user._id, isRead: false }, { $set: { isRead: true } });
+  await Notification.markAllRead(req.user.id);
   res.json({ ok: true });
 }
 

@@ -11,26 +11,21 @@ async function createPost(req, res) {
   if (!req.file) return res.status(400).json({ message: 'Media file is required' });
 
   const post = await Post.create({
-    author: req.user._id,
+    authorId: req.user.id,
     caption: req.body.caption || '',
     mediaUrl: toPublicMediaPath(req.file),
     mediaType: getMediaType(req.file.mimetype)
   });
 
   cache.del('feed:latest');
-  const populated = await post.populate('author', 'username avatarUrl');
-  res.status(201).json(populated);
+  res.status(201).json(post);
 }
 
 async function getFeed(req, res) {
   const cached = cache.get('feed:latest');
   if (cached) return res.json(cached);
 
-  const posts = await Post.find()
-    .populate('author', 'username avatarUrl')
-    .populate('comments.user', 'username avatarUrl')
-    .sort({ createdAt: -1 })
-    .limit(50);
+  const posts = await Post.getFeed();
 
   cache.set('feed:latest', posts);
   res.json(posts);
@@ -40,28 +35,28 @@ async function toggleLike(req, res) {
   const post = await Post.findById(req.params.postId);
   if (!post) return res.status(404).json({ message: 'Post not found' });
 
-  const userId = String(req.user._id);
-  const alreadyLiked = post.likes.some((id) => String(id) === userId);
+  const userId = req.user.id;
+  const alreadyLiked = await Post.isLikedBy(post.id, userId);
 
   if (alreadyLiked) {
-    post.likes = post.likes.filter((id) => String(id) !== userId);
+    await Post.removeLike(post.id, userId);
   } else {
-    post.likes.push(req.user._id);
+    await Post.addLike(post.id, userId);
 
-    if (String(post.author) !== userId) {
+    if (post.author.id !== userId) {
       await createNotification({
-        recipient: post.author,
-        sender: req.user._id,
+        recipientId: post.author.id,
+        senderId: userId,
         type: 'like',
-        post: post._id,
+        postId: post.id,
         message: `${req.user.username} liked your post`
       });
     }
   }
 
-  await post.save();
+  const likesCount = await Post.getLikesCount(post.id);
   cache.del('feed:latest');
-  res.json({ likesCount: post.likes.length, liked: !alreadyLiked });
+  res.json({ likesCount, liked: !alreadyLiked });
 }
 
 async function addComment(req, res) {
@@ -71,50 +66,42 @@ async function addComment(req, res) {
   const post = await Post.findById(req.params.postId);
   if (!post) return res.status(404).json({ message: 'Post not found' });
 
-  post.comments.push({ user: req.user._id, text: req.body.text });
-  await post.save();
-  await post.populate('comments.user', 'username avatarUrl');
+  const comment = await Post.addComment(post.id, req.user.id, req.body.text);
 
-  if (String(post.author) !== String(req.user._id)) {
+  if (post.author.id !== req.user.id) {
     await createNotification({
-      recipient: post.author,
-      sender: req.user._id,
+      recipientId: post.author.id,
+      senderId: req.user.id,
       type: 'comment',
-      post: post._id,
+      postId: post.id,
       message: `${req.user.username} commented on your post`
     });
   }
 
   cache.del('feed:latest');
-  res.status(201).json(post.comments[post.comments.length - 1]);
+  res.status(201).json(comment);
 }
 
 async function followUser(req, res) {
   const target = await User.findById(req.params.userId);
   if (!target) return res.status(404).json({ message: 'User not found' });
-  if (String(target._id) === String(req.user._id)) return res.status(400).json({ message: 'Cannot follow yourself' });
+  if (target.id === req.user.id) return res.status(400).json({ message: 'Cannot follow yourself' });
 
-  const me = await User.findById(req.user._id);
-  const isFollowing = me.following.some((id) => String(id) === String(target._id));
+  const alreadyFollowing = await User.isFollowing(req.user.id, target.id);
 
-  if (isFollowing) {
-    me.following = me.following.filter((id) => String(id) !== String(target._id));
-    target.followers = target.followers.filter((id) => String(id) !== String(me._id));
+  if (alreadyFollowing) {
+    await User.unfollow(req.user.id, target.id);
   } else {
-    me.following.push(target._id);
-    target.followers.push(me._id);
+    await User.follow(req.user.id, target.id);
     await createNotification({
-      recipient: target._id,
-      sender: me._id,
+      recipientId: target.id,
+      senderId: req.user.id,
       type: 'follow',
-      message: `${me.username} started following you`
+      message: `${req.user.username} started following you`
     });
   }
 
-  await me.save();
-  await target.save();
-
-  res.json({ following: !isFollowing });
+  res.json({ following: !alreadyFollowing });
 }
 
 module.exports = { createPost, getFeed, toggleLike, addComment, followUser };

@@ -7,7 +7,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
-const connectDB = require('./config/db');
+const { connectDB } = require('./config/db');
 const { initSocket } = require('./config/socket');
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
@@ -49,6 +49,6 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error('Mongo connection failed:', err.message);
+    console.error('PostgreSQL connection failed:', err.message);
     process.exit(1);
   });
