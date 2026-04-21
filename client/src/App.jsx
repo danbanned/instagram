@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import FeedPage from './pages/FeedPage';
+import ProfilePage from './pages/ProfilePage';
 import useAuth from './hooks/useAuth';
 
 function PrivateRoute({ children }) {
@@ -21,6 +22,14 @@ export default function App() {
         element={
           <PrivateRoute>
             <FeedPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile/:userId"
+        element={
+          <PrivateRoute>
+            <ProfilePage />
           </PrivateRoute>
         }
       />

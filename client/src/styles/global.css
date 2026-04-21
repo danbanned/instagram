@@ -7,22 +7,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; }
 
-.app-shell {
-  min-height: 100vh;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid #dbe2ea;
-  background: #fff;
-  position: sticky;
-  top: 0;
-}
-
-.navbar-right { display: flex; gap: 10px; align-items: center; }
+/* Navbar styles live in src/styles/Navbar.css */
+/* .app-shell rules are defined in the responsive section below */
 
 .content-grid {
   max-width: 1100px;
@@ -115,4 +101,119 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 @media (max-width: 900px) {
   .content-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   RESPONSIVE UTILITY CLASSES
+   ============================================ */
+
+.hide-mobile  { display: block; }
+.show-mobile  { display: none; }
+
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: block !important; }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop  { display: none !important; }
+  .show-desktop  { display: block !important; }
+}
+
+/* Responsive container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 0 12px; }
+}
+
+/* Responsive grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Main content spacing — accounts for fixed navbar height */
+.app-shell {
+  padding-top: 68px;      /* desktop navbar height */
+  padding-bottom: 20px;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    padding-top: 56px;    /* mobile header height */
+    padding-bottom: 72px; /* bottom nav height */
+  }
+}
+
+/* Flex utility */
+.flex-responsive {
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .flex-responsive {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Responsive typography */
+h1 { font-size: 32px; }
+
+@media (max-width: 768px) {
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 18px; }
+  p  { font-size: 14px; }
+}
+
+/* Touch-friendly tap targets */
+button,
+a.nav-link,
+a.bottom-nav-link,
+a.mobile-nav-link {
+  min-height: 44px;
+}
+
+/* Responsive images */
+.responsive-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Post cards: full-bleed on mobile */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 }
