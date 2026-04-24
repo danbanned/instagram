@@ -1,122 +1,274 @@
-const { pool } = require('../config/db');
+const prisma = require('../config/prisma');
 
-const FEED_QUERY = `
-  SELECT
-    p.id, p.caption, p.media_url AS "mediaUrl", p.media_type AS "mediaType",
-    p.created_at AS "createdAt", p.updated_at AS "updatedAt",
-    p.author_id AS "authorId",
-    u.username AS "authorUsername", u.avatar_url AS "authorAvatarUrl",
-    COUNT(DISTINCT pl.user_id)::int AS "likesCount",
-    COALESCE(
-      JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'id',        c.id,
-          'text',      c.text,
-          'createdAt', c.created_at,
-          'user', JSON_BUILD_OBJECT(
-            'id',        cu.id,
-            'username',  cu.username,
-            'avatarUrl', cu.avatar_url
-          )
-        ) ORDER BY c.created_at ASC
-      ) FILTER (WHERE c.id IS NOT NULL),
-      '[]'
-    ) AS comments
-  FROM posts p
-  JOIN users u ON u.id = p.author_id
-  LEFT JOIN post_likes pl ON pl.post_id = p.id
-  LEFT JOIN comments c ON c.post_id = p.id
-  LEFT JOIN users cu ON cu.id = c.user_id
-`;
+const POST_INCLUDE = {
+  author: { select: { id: true, username: true, avatarUrl: true } },
+  comments: {
+    include: { user: { select: { id: true, username: true, avatarUrl: true } } },
+    orderBy: { createdAt: 'asc' },
+  },
+  _count: { select: { likes: true } },
+};
 
-function rowToPost(row) {
+function transformPost(post, likedByMe = false, savedByMe = false) {
   return {
-    id: row.id,
-    caption: row.caption,
-    mediaUrl: row.mediaUrl,
-    mediaType: row.mediaType,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    likesCount: row.likesCount,
-    comments: row.comments,
+    id: post.id,
+    caption: post.caption,
+    mediaUrl: post.mediaUrl,
+    mediaType: post.mediaType,
+    location: post.location || null,
+    isAIGenerated: post.isAIGenerated || false,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    likesCount: post._count.likes,
+    likedByMe,
+    savedByMe,
+    comments: post.comments.map((c) => ({
+      id: c.id,
+      text: c.text,
+      createdAt: c.createdAt,
+      user: { id: c.user.id, username: c.user.username, avatarUrl: c.user.avatarUrl },
+    })),
     author: {
-      id: row.authorId,
-      username: row.authorUsername,
-      avatarUrl: row.authorAvatarUrl
-    }
+      id: post.author.id,
+      username: post.author.username,
+      avatarUrl: post.author.avatarUrl,
+    },
   };
 }
 
-async function create({ authorId, caption, mediaUrl, mediaType }) {
-  const { rows } = await pool.query(
-    `INSERT INTO posts (author_id, caption, media_url, media_type)
-     VALUES ($1, $2, $3, $4) RETURNING id`,
-    [authorId, caption || '', mediaUrl, mediaType]
-  );
-  return findById(rows[0].id);
+async function create({ authorId, caption, mediaUrl, mediaType, location, altText, hideLikeCount, commentsDisabled }) {
+  const post = await prisma.post.create({
+    data: {
+      authorId,
+      caption: caption || '',
+      mediaUrl,
+      mediaType,
+      location:         location         || null,
+      altText:          altText          || null,
+      hideLikeCount:    !!hideLikeCount,
+      commentsDisabled: !!commentsDisabled,
+    },
+    include: POST_INCLUDE,
+  });
+  return transformPost(post);
 }
 
 async function findById(id) {
-  const { rows } = await pool.query(
-    FEED_QUERY + ' WHERE p.id = $1 GROUP BY p.id, u.id',
-    [id]
-  );
-  return rows[0] ? rowToPost(rows[0]) : null;
+  const post = await prisma.post.findUnique({ where: { id }, include: POST_INCLUDE });
+  return post ? transformPost(post) : null;
 }
 
-async function getFeed() {
-  const { rows } = await pool.query(
-    FEED_QUERY + ' GROUP BY p.id, u.id ORDER BY p.created_at DESC LIMIT 50'
+async function getFeed(userId, { cursor, limit = 10 } = {}) {
+  const query = {
+    include: POST_INCLUDE,
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  };
+
+  if (cursor) {
+    query.cursor = { id: cursor };
+    query.skip = 1;
+  }
+
+  const posts = await prisma.post.findMany(query);
+
+  let likedSet = new Set();
+  let savedSet = new Set();
+
+  if (userId && posts.length) {
+    const postIds = posts.map((p) => p.id);
+
+    const [likes, saves] = await Promise.all([
+      prisma.postLike.findMany({
+        where: { userId, postId: { in: postIds } },
+        select: { postId: true },
+      }),
+      prisma.savedPost.findMany({
+        where: { userId, postId: { in: postIds } },
+        select: { postId: true },
+      }),
+    ]);
+
+    likedSet = new Set(likes.map((l) => l.postId));
+    savedSet = new Set(saves.map((s) => s.postId));
+  }
+
+  const formattedPosts = posts.map((post) =>
+    transformPost(post, likedSet.has(post.id), savedSet.has(post.id))
   );
-  return rows.map(rowToPost);
+
+  const nextCursor = posts.length === limit ? posts[posts.length - 1].id : null;
+
+  return { posts: formattedPosts, nextCursor, hasMore: posts.length === limit };
 }
 
 async function isLikedBy(postId, userId) {
-  const { rows } = await pool.query(
-    'SELECT 1 FROM post_likes WHERE post_id = $1 AND user_id = $2',
-    [postId, userId]
-  );
-  return rows.length > 0;
+  const like = await prisma.postLike.findUnique({
+    where: { postId_userId: { postId, userId } },
+  });
+  return like !== null;
 }
 
 async function addLike(postId, userId) {
-  await pool.query(
-    'INSERT INTO post_likes (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-    [postId, userId]
-  );
+  await prisma.postLike.upsert({
+    where: { postId_userId: { postId, userId } },
+    update: {},
+    create: { postId, userId },
+  });
 }
 
 async function removeLike(postId, userId) {
-  await pool.query(
-    'DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2',
-    [postId, userId]
-  );
+  await prisma.postLike.deleteMany({ where: { postId, userId } });
 }
 
 async function getLikesCount(postId) {
-  const { rows } = await pool.query(
-    'SELECT COUNT(*)::int AS count FROM post_likes WHERE post_id = $1',
-    [postId]
-  );
-  return rows[0].count;
+  return prisma.postLike.count({ where: { postId } });
 }
 
-async function addComment(postId, userId, text) {
-  const { rows } = await pool.query(
-    `INSERT INTO comments (post_id, user_id, text) VALUES ($1, $2, $3) RETURNING *`,
-    [postId, userId, text]
-  );
-  const { rows: userRows } = await pool.query(
-    'SELECT id, username, avatar_url FROM users WHERE id = $1',
-    [userId]
-  );
-  const u = userRows[0];
+function transformComment(c, currentUserId) {
   return {
-    id: rows[0].id,
-    text: rows[0].text,
-    createdAt: rows[0].created_at,
-    user: { id: u.id, username: u.username, avatarUrl: u.avatar_url }
+    id: c.id,
+    text: c.text,
+    createdAt: c.createdAt,
+    user: { id: c.user.id, username: c.user.username, avatarUrl: c.user.avatarUrl },
+    likesCount: c._count?.likes || 0,
+    isLiked: c.likes?.length > 0,
+    isAuthor: c.userId === currentUserId,
+    replies: (c.replies || []).map((r) => transformComment(r, currentUserId)),
   };
 }
 
-module.exports = { create, findById, getFeed, isLikedBy, addLike, removeLike, getLikesCount, addComment };
+async function getComments(postId, currentUserId) {
+  const comments = await prisma.comment.findMany({
+    where: { postId, parentId: null },
+    include: {
+      user: { select: { id: true, username: true, avatarUrl: true } },
+      replies: {
+        include: {
+          user: { select: { id: true, username: true, avatarUrl: true } },
+          _count: { select: { likes: true } },
+          likes: { where: { userId: currentUserId }, select: { userId: true } },
+        },
+        orderBy: { createdAt: 'asc' },
+      },
+      _count: { select: { likes: true } },
+      likes: { where: { userId: currentUserId }, select: { userId: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  return comments.map((c) => transformComment(c, currentUserId));
+}
+
+// ✅ FIXED: Removed _count from create operation
+async function addComment(postId, userId, text, parentId = null) {
+  const comment = await prisma.comment.create({
+    data: { 
+      postId, 
+      userId, 
+      text, 
+      ...(parentId ? { parentId } : {}) 
+    },
+    include: {
+      user: { 
+        select: { 
+          id: true, 
+          username: true, 
+          avatarUrl: true 
+        } 
+      },
+      // ❌ REMOVED _count - doesn't work with create()
+    },
+  });
+  
+  // Return comment with default values (new comment has 0 likes)
+  return {
+    id: comment.id,
+    text: comment.text,
+    createdAt: comment.createdAt,
+    userId: comment.userId,
+    user: { 
+      id: comment.user.id, 
+      username: comment.user.username, 
+      avatarUrl: comment.user.avatarUrl 
+    },
+    likesCount: 0,        // New comment starts with 0 likes
+    isLiked: false,       // User hasn't liked their own comment yet
+    isAuthor: true,       // Current user is the author
+    replies: [],
+  };
+}
+
+async function deleteComment(commentId, userId) {
+  const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  if (!comment) throw Object.assign(new Error('Comment not found'), { status: 404 });
+  if (comment.userId !== userId) throw Object.assign(new Error('Unauthorized'), { status: 403 });
+  await prisma.comment.delete({ where: { id: commentId } });
+}
+
+async function toggleCommentLike(commentId, userId) {
+  const existing = await prisma.commentLike.findUnique({
+    where: { commentId_userId: { commentId, userId } },
+  });
+  if (existing) {
+    await prisma.commentLike.delete({ where: { commentId_userId: { commentId, userId } } });
+  } else {
+    await prisma.commentLike.create({ data: { commentId, userId } });
+  }
+  const likesCount = await prisma.commentLike.count({ where: { commentId } });
+  return { isLiked: !existing, likesCount };
+}
+
+async function isSavedBy(postId, userId) {
+  const saved = await prisma.savedPost.findUnique({
+    where: { userId_postId: { userId, postId } },
+  });
+  return saved !== null;
+}
+
+async function savePost(postId, userId) {
+  await prisma.savedPost.upsert({
+    where: { userId_postId: { userId, postId } },
+    update: {},
+    create: { userId, postId },
+  });
+}
+
+async function unsavePost(postId, userId) {
+  await prisma.savedPost.deleteMany({ where: { postId, userId } });
+}
+
+async function recordShare(postId) {
+  await prisma.postAnalytics.upsert({
+    where: { postId },
+    update: { shares: { increment: 1 } },
+    create: { postId, shares: 1 },
+  });
+}
+
+async function getByUser(userId) {
+  const posts = await prisma.post.findMany({
+    where: { authorId: userId },
+    include: POST_INCLUDE,
+    orderBy: { createdAt: 'desc' },
+  });
+  return posts.map(p => transformPost(p));
+}
+
+module.exports = {
+  create,
+  findById,
+  getFeed,
+  getByUser,
+  isLikedBy,
+  addLike,
+  removeLike,
+  getLikesCount,
+  getComments,
+  addComment,
+  deleteComment,
+  toggleCommentLike,
+  isSavedBy,
+  savePost,
+  unsavePost,
+  recordShare,
+};

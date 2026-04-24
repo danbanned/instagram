@@ -1,0 +1,337 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String   @unique @db.VarChar(50)
+  email     String   @unique @db.VarChar(255)
+  password  String
+  bio       String   @default("")
+  avatarUrl String   @default("") @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  profile               Profile?
+  posts                 Post[]           @relation("AuthorPosts")
+  comments              Comment[]
+  postLikes             PostLike[]
+  commentLikes          CommentLike[]
+  followers             Follow[]         @relation("Following")
+  following             Follow[]         @relation("Follower")
+  sentNotifications     Notification[]   @relation("SentNotifications")
+  receivedNotifications Notification[]   @relation("ReceivedNotifications")
+  stories               Story[]
+  savedPosts            SavedPost[]
+  storyViews            StoryView[]
+  storyReplies          StoryReply[]
+  storyReactions        StoryReaction[]
+  storyHighlights       StoryHighlight[]
+  highlights            Highlight[]
+  reposts               Repost[]
+  postTags              PostTag[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique @map("user_id") @db.Uuid
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String?
+  bio                String?
+  website            String?
+  phoneNumber        String?  @map("phone_number")
+  gender             String?
+  isPrivate          Boolean  @default(false) @map("is_private")
+  showActivityStatus Boolean  @default(true) @map("show_activity_status")
+  isBusiness         Boolean  @default(false) @map("is_business")
+  category           String?
+  links              Json?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("profiles")
+}
+
+model Post {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authorId         String   @map("author_id") @db.Uuid
+  caption          String   @default("")
+  mediaUrl         String   @map("media_url")
+  mediaType        String   @default("image") @map("media_type") @db.VarChar(10)
+  location         String?
+  isAIGenerated    Boolean  @default(false) @map("is_ai_generated")
+  altText          String?  @map("alt_text")
+  isCollaborative  Boolean  @default(false) @map("is_collaborative")
+  collaborators    String[] @default([])
+  hideLikeCount    Boolean  @default(false) @map("hide_like_count")
+  hideViewCount    Boolean  @default(false) @map("hide_view_count")
+  commentsDisabled Boolean  @default(false) @map("comments_disabled")
+  shareToThreads   Boolean  @default(false) @map("share_to_threads")
+  shareToFacebook  Boolean  @default(false) @map("share_to_facebook")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  author        User           @relation("AuthorPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  comments      Comment[]
+  likes         PostLike[]
+  notifications Notification[]
+  savedBy       SavedPost[]
+  analytics     PostAnalytics?
+  reposts       Repost[]
+  tags          PostTag[]
+
+  @@index([authorId])
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  parentId  String?  @map("parent_id") @db.Uuid
+  text      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  post    Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[]     @relation("CommentReplies")
+  likes   CommentLike[]
+
+  @@index([postId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model PostLike {
+  postId String @map("post_id") @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@map("post_likes")
+}
+
+model CommentLike {
+  commentId String @map("comment_id") @db.Uuid
+  userId    String @map("user_id") @db.Uuid
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([commentId, userId])
+  @@map("comment_likes")
+}
+
+model Follow {
+  followerId  String @map("follower_id") @db.Uuid
+  followingId String @map("following_id") @db.Uuid
+
+  follower  User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followerId])
+  @@map("follows")
+}
+
+model Notification {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  recipientId String   @map("recipient_id") @db.Uuid
+  senderId    String   @map("sender_id") @db.Uuid
+  type        String   @db.VarChar(20)
+  postId      String?  @map("post_id") @db.Uuid
+  message     String
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  recipient User  @relation("ReceivedNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User  @relation("SentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  post      Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId])
+  @@map("notifications")
+}
+
+model Story {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  mediaUrl          String?   @map("media_url")
+  mediaType         String    @default("image") @map("media_type") @db.VarChar(10)
+  text              String?
+  duration          Int       @default(5000)
+  seenBy            String[]  @default([]) @map("seen_by")
+  allowReplies      Boolean   @default(true) @map("allow_replies")
+  allowReactions    Boolean   @default(true) @map("allow_reactions")
+  allowSharing      Boolean   @default(true) @map("allow_sharing")
+  isCloseFriendOnly Boolean   @default(false) @map("is_close_friend_only")
+  stickersData      Json?     @map("stickers_data")
+  audioId           String?   @map("audio_id")
+  audioUrl          String?   @map("audio_url")
+  viewCount         Int       @default(0) @map("view_count")
+  highlightId       String?   @map("highlight_id") @db.Uuid
+  isArchived        Boolean   @default(false) @map("is_archived")
+  archivedAt        DateTime? @map("archived_at") @db.Timestamptz(6)
+  closeFriendsList  String[]  @default([]) @map("close_friends_list")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz(6)
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  highlight StoryHighlight? @relation(fields: [highlightId], references: [id], onDelete: SetNull)
+  views     StoryView[]
+  replies   StoryReply[]
+  reactions StoryReaction[]
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("stories")
+}
+
+model StoryView {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storyId        String   @map("story_id") @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  viewedAt       DateTime @default(now()) @map("viewed_at") @db.Timestamptz(6)
+  tappedForward  Boolean  @default(false) @map("tapped_forward")
+  tappedBackward Boolean  @default(false) @map("tapped_backward")
+  exited         Boolean  @default(false)
+  completed      Boolean  @default(false)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, userId])
+  @@index([storyId])
+  @@map("story_views")
+}
+
+model StoryReply {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storyId   String   @map("story_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  text      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([storyId])
+  @@map("story_replies")
+}
+
+model StoryReaction {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storyId   String   @map("story_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @db.VarChar(10)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, userId])
+  @@index([storyId])
+  @@map("story_reactions")
+}
+
+model StoryHighlight {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String
+  coverUrl  String?  @map("cover_url")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stories Story[]
+
+  @@index([userId])
+  @@map("story_highlights")
+}
+
+model Highlight {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  coverUrl  String?  @map("cover_url")
+  stories   String[] // Array of story IDs
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("highlights")
+}
+
+model PostAnalytics {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId        String   @unique @map("post_id") @db.Uuid
+  reach         Int      @default(0)
+  impressions   Int      @default(0)
+  profileVisits Int      @default(0) @map("profile_visits")
+  shares        Int      @default(0)
+  saves         Int      @default(0)
+  tapsForward   Int      @default(0) @map("taps_forward")
+  tapsBackward  Int      @default(0) @map("taps_backward")
+  exits         Int      @default(0)
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("post_analytics")
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id") @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  savedAt   DateTime @default(now()) @map("saved_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@map("saved_posts")
+}
+
+model Repost {
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id") @db.Uuid
+  originalPostId String   @map("original_post_id") @db.Uuid
+  caption        String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originalPost Post @relation(fields: [originalPostId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, originalPostId])
+  @@index([userId])
+  @@map("reposts")
+}
+
+model PostTag {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid // User being tagged
+  taggedBy  String   @map("tagged_by") @db.Uuid // User who tagged
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([userId])
+  @@map("post_tags")
+}

@@ -11,24 +11,38 @@ async function createPost(req, res) {
   if (!req.file) return res.status(400).json({ message: 'Media file is required' });
 
   const post = await Post.create({
-    authorId: req.user.id,
-    caption: req.body.caption || '',
-    mediaUrl: toPublicMediaPath(req.file),
-    mediaType: getMediaType(req.file.mimetype)
+    authorId:         req.user.id,
+    caption:          req.body.caption          || '',
+    mediaUrl:         toPublicMediaPath(req.file),
+    mediaType:        getMediaType(req.file.mimetype),
+    location:         req.body.location         || null,
+    altText:          req.body.altText          || null,
+    hideLikeCount:    req.body.hideLikeCount    === 'true',
+    commentsDisabled: req.body.commentsDisabled === 'true',
   });
 
-  cache.del('feed:latest');
+  cache.del(`feed:${req.user.id}`);
   res.status(201).json(post);
 }
 
 async function getFeed(req, res) {
-  const cached = cache.get('feed:latest');
-  if (cached) return res.json(cached);
+  const userId = req.user.id;
+  const cursor = req.query.cursor || null;
+  const limit = Math.min(parseInt(req.query.limit) || 10, 20);
 
-  const posts = await Post.getFeed();
+  // Only use cache for the first page (no cursor)
+  if (!cursor) {
+    const cacheKey = `feed:${userId}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json(cached);
 
-  cache.set('feed:latest', posts);
-  res.json(posts);
+    const result = await Post.getFeed(userId, { limit });
+    cache.set(cacheKey, result);
+    return res.json(result);
+  }
+
+  const result = await Post.getFeed(userId, { cursor, limit });
+  res.json(result);
 }
 
 async function toggleLike(req, res) {
@@ -49,37 +63,57 @@ async function toggleLike(req, res) {
         senderId: userId,
         type: 'like',
         postId: post.id,
-        message: `${req.user.username} liked your post`
+        message: `${req.user.username} liked your post`,
       });
     }
   }
 
   const likesCount = await Post.getLikesCount(post.id);
-  cache.del('feed:latest');
+  cache.del(`feed:${userId}`);
   res.json({ likesCount, liked: !alreadyLiked });
 }
 
-async function addComment(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+async function addComment(req, res, next) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    const comment = await Post.addComment(post.id, req.user.id, req.body.text, req.body.parentId || null);
+
+    if (post.author.id !== req.user.id) {
+      createNotification({
+        recipientId: post.author.id,
+        senderId: req.user.id,
+        type: 'comment',
+        postId: post.id,
+        message: `${req.user.username} commented on your post`,
+      }).catch(() => {});
+    }
+
+    cache.del(`feed:${req.user.id}`);
+    res.status(201).json(comment);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function toggleSave(req, res) {
   const post = await Post.findById(req.params.postId);
   if (!post) return res.status(404).json({ message: 'Post not found' });
 
-  const comment = await Post.addComment(post.id, req.user.id, req.body.text);
+  const userId = req.user.id;
+  const alreadySaved = await Post.isSavedBy(post.id, userId);
 
-  if (post.author.id !== req.user.id) {
-    await createNotification({
-      recipientId: post.author.id,
-      senderId: req.user.id,
-      type: 'comment',
-      postId: post.id,
-      message: `${req.user.username} commented on your post`
-    });
+  if (alreadySaved) {
+    await Post.unsavePost(post.id, userId);
+  } else {
+    await Post.savePost(post.id, userId);
   }
 
-  cache.del('feed:latest');
-  res.status(201).json(comment);
+  res.json({ saved: !alreadySaved });
 }
 
 async function followUser(req, res) {
@@ -97,11 +131,45 @@ async function followUser(req, res) {
       recipientId: target.id,
       senderId: req.user.id,
       type: 'follow',
-      message: `${req.user.username} started following you`
+      message: `${req.user.username} started following you`,
     });
   }
 
   res.json({ following: !alreadyFollowing });
 }
 
-module.exports = { createPost, getFeed, toggleLike, addComment, followUser };
+async function getComments(req, res, next) {
+  try {
+    const comments = await Post.getComments(req.params.postId, req.user.id);
+    res.json({ comments });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function deleteComment(req, res, next) {
+  try {
+    await Post.deleteComment(req.params.commentId, req.user.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+}
+
+async function toggleCommentLike(req, res, next) {
+  try {
+    const result = await Post.toggleCommentLike(req.params.commentId, req.user.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function recordShare(req, res) {
+  const post = await Post.findById(req.params.postId);
+  if (!post) return res.status(404).json({ message: 'Post not found' });
+  await Post.recordShare(post.id);
+  res.json({ success: true });
+}
+
+module.exports = { createPost, getFeed, toggleLike, addComment, getComments, deleteComment, toggleCommentLike, toggleSave, followUser, recordShare };
