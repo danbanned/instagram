@@ -53,6 +53,24 @@ async function getProfile(req, res) {
       orderBy: { createdAt: 'desc' }
     });
 
+    // Check if user has an active story
+    const now = new Date();
+    const activeStory = await prisma.story.findFirst({
+      where: { userId, expiresAt: { gt: now }, isArchived: false }
+    });
+
+    // Get followers and following lists for modals
+    const followersList = await prisma.follow.findMany({
+      where: { followingId: userId },
+      include: { follower: { select: { id: true, username: true, avatarUrl: true, profile: { select: { name: true } } } } },
+      take: 50
+    });
+    const followingList = await prisma.follow.findMany({
+      where: { followerId: userId },
+      include: { following: { select: { id: true, username: true, avatarUrl: true, profile: { select: { name: true } } } } },
+      take: 50
+    });
+
     // Format response
     const profileData = {
       userId: user.id,
@@ -63,10 +81,25 @@ async function getProfile(req, res) {
       website: user.profile?.website,
       isPrivate: user.profile?.isPrivate || false,
       isBusiness: user.profile?.isBusiness || false,
+      hasStory: !!activeStory,
       stats: {
         postsCount: user._count.posts,
         followersCount: user._count.followers,
-        followingCount: user._count.following
+        followingCount: user._count.following,
+        followers: followersList.map(f => ({
+          id: f.follower.id,
+          username: f.follower.username,
+          avatar: f.follower.avatarUrl,
+          name: f.follower.profile?.name || f.follower.username,
+          isFollowing: false
+        })),
+        following: followingList.map(f => ({
+          id: f.following.id,
+          username: f.following.username,
+          avatar: f.following.avatarUrl,
+          name: f.following.profile?.name || f.following.username,
+          isFollowing: true
+        }))
       },
       isFollowing,
       highlights
@@ -92,6 +125,41 @@ async function getProfile(req, res) {
   } catch (error) {
     console.error('Profile fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+}
+
+/**
+ * @desc    Get reels (video posts) for a user
+ * @route   GET /api/profile/:userId/reels
+ * @access  Public
+ */
+async function getReels(req, res) {
+  try {
+    const { userId } = req.params;
+
+    const reels = await prisma.post.findMany({
+      where: { authorId: userId, mediaType: 'video' },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { likes: true, comments: true } }
+      }
+    });
+
+    const items = reels.map(post => ({
+      id: post.id,
+      type: 'video',
+      mediaUrl: post.mediaUrl,
+      caption: post.caption,
+      likesCount: post._count.likes,
+      commentsCount: post._count.comments,
+      createdAt: post.createdAt
+    }));
+
+    res.json({ success: true, items });
+
+  } catch (error) {
+    console.error('Reels error:', error);
+    res.status(500).json({ error: 'Failed to fetch reels' });
   }
 }
 
@@ -276,6 +344,7 @@ async function updateProfile(req, res) {
 
 module.exports = {
   getProfile,
+  getReels,
   getSavedPosts,
   getReposts,
   getTaggedPosts,

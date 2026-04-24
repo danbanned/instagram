@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import api from '../../services/api';
 import styles from './EditProfileModal.module.css';
 
 export default function EditProfileModal({ profile, isOpen, onClose, onSave }) {
@@ -20,20 +21,9 @@ export default function EditProfileModal({ profile, isOpen, onClose, onSave }) {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('/api/profile/update', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          // Auth header would go here if not handled by interceptors/cookies
-        },
-        body: JSON.stringify(formData)
-      });
-      if (response.ok) {
-        onSave(formData);
-        onClose();
-      } else {
-        alert('Failed to update profile');
-      }
+      await api.put('/profile/update', formData);
+      onSave(formData);
+      onClose();
     } catch (error) {
       console.error('Update profile error:', error);
       alert('Error updating profile');
