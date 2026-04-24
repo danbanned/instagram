@@ -4,14 +4,13 @@ import useAuth from '../hooks/useAuth';
 import useSocket from '../hooks/useSocket';
 import { fetchFeed, toggleLike, addComment, toggleSave, toggleFollow } from '../services/postService';
 import { fetchNotifications, markNotificationsRead } from '../services/notificationService';
-import Navbar from '../components/Navbar';
+import RightSidebar from '../components/RightSidebar';
 import PostComposer from '../components/PostComposer';
 import FeedList from '../components/FeedList';
-import NotificationPanel from '../components/NotificationPanel';
 import StoriesTray from '../components/StoriesTray';
 
 export default function FeedPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState([]);
 
@@ -156,49 +155,45 @@ export default function FeedPage() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <main className="app-shell">
-      <Navbar user={user} onLogout={logout} />
+    <>
+      <main className="feed-column">
+        <StoriesTray />
+        
+        <PostComposer onCreated={() => refetch()} />
 
-      <StoriesTray />
+        {isLoading ? (
+          <p className="card" style={{ textAlign: 'center', color: '#8e8e8e' }}>
+            Loading feed…
+          </p>
+        ) : isError ? (
+          <p className="card" style={{ textAlign: 'center', color: 'red' }}>
+            Failed to load feed.
+          </p>
+        ) : (
+          <FeedList
+            posts={posts}
+            currentUser={user}
+            onLike={handleLike}
+            onComment={handleComment}
+            onSave={handleSave}
+            onFollow={handleFollow}
+          />
+        )}
 
-      <section className="content-grid">
-        <div>
-          <PostComposer onCreated={() => refetch()} />
+        {isFetchingNextPage && (
+          <p style={{ textAlign: 'center', color: '#8e8e8e', padding: '16px' }}>
+            Loading more…
+          </p>
+        )}
 
-          {isLoading ? (
-            <p className="card" style={{ textAlign: 'center', color: '#8e8e8e' }}>
-              Loading feed…
-            </p>
-          ) : isError ? (
-            <p className="card" style={{ textAlign: 'center', color: 'red' }}>
-              Failed to load feed.
-            </p>
-          ) : (
-            <FeedList
-              posts={posts}
-              currentUser={user}
-              onLike={handleLike}
-              onComment={handleComment}
-              onSave={handleSave}
-              onFollow={handleFollow}
-            />
-          )}
+        {!isLoading && !hasNextPage && posts.length > 0 && (
+          <p style={{ textAlign: 'center', color: '#8e8e8e', padding: '20px', fontSize: '14px' }}>
+            You're all caught up
+          </p>
+        )}
+      </main>
 
-          {isFetchingNextPage && (
-            <p style={{ textAlign: 'center', color: '#8e8e8e', padding: '16px' }}>
-              Loading more…
-            </p>
-          )}
-
-          {!isLoading && !hasNextPage && posts.length > 0 && (
-            <p style={{ textAlign: 'center', color: '#8e8e8e', padding: '20px', fontSize: '14px' }}>
-              You're all caught up
-            </p>
-          )}
-        </div>
-
-        <NotificationPanel notifications={notifications} onMarkRead={markRead} />
-      </section>
-    </main>
+      <RightSidebar user={user} />
+    </>
   );
 }

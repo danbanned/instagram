@@ -1,0 +1,177 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContainer {
+  background: white;
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  max-height: 90vh;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  color: #262626;
+  line-height: 1;
+}
+
+.modalContent {
+  display: flex;
+  height: 100%;
+}
+
+.postImageSide {
+  flex: 1.5;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #efefef;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.commentsSide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  min-width: 350px;
+}
+
+.postHeader {
+  padding: 14px 16px;
+  border-bottom: 1px solid #efefef;
+  display: flex;
+  gap: 14px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.caption {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #262626;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+.commentsList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.loading, .noComments {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #8e8e8e;
+  font-size: 14px;
+}
+
+.replyingTo {
+  padding: 8px 16px;
+  background: #fafafa;
+  border-top: 1px solid #efefef;
+  font-size: 12px;
+  color: #8e8e8e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.replyingTo button {
+  background: none;
+  border: none;
+  color: #262626;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitError {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #ed4956;
+  background: #fff5f5;
+  text-align: center;
+  border-top: 1px solid #efefef;
+}
+
+.inputWrapper {
+  padding: 12px 16px;
+  border-top: 1px solid #efefef;
+}
+
+@media (max-width: 768px) {
+  .modalContainer {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .modalContent {
+    flex-direction: column;
+  }
+  
+  .postImageSide {
+    display: none; /* Hide image on mobile to focus on comments */
+  }
+  
+  .closeButton {
+    display: block;
+  }
+  
+  .commentsSide {
+    flex: 1;
+    min-width: 0;
+  }
+}

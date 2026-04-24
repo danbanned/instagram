@@ -1,0 +1,269 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 -4px 28px rgba(0, 0, 0, 0.18);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  background: #fff;
+  border-bottom: 1px solid #efefef;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #262626;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #8e8e8e;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.closeBtn:hover {
+  background: #f0f0f0;
+}
+
+/* Post preview */
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #efefef;
+}
+
+.previewAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #efefef;
+}
+
+.previewText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.previewUser {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.previewCaption {
+  font-size: 13px;
+  color: #8e8e8e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search */
+.searchWrap {
+  position: relative;
+  padding: 12px 20px;
+  border-bottom: 1px solid #efefef;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid #dbdbdb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fafafa;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.searchInput:focus {
+  border-color: #a8a8a8;
+  background: #fff;
+}
+
+/* User list */
+.userList {
+  max-height: 260px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.placeholder {
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 0;
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.userRow:hover {
+  background: #fafafa;
+}
+
+.userAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #efefef;
+}
+
+.userUsername {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #efefef;
+  margin: 6px 0;
+}
+
+/* Action rows (Copy link, Add to story) */
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 13px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.actionRow:hover {
+  background: #fafafa;
+}
+
+.actionIcon {
+  font-size: 20px;
+  width: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.actionLabel {
+  font-size: 14px;
+  color: #262626;
+}
+
+/* Platform grid */
+.platformGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 14px 20px 20px;
+}
+
+.platformBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 10px;
+  transition: background 0.12s;
+}
+
+.platformBtn:hover {
+  background: #fafafa;
+}
+
+.platformIcon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.platformLabel {
+  font-size: 11px;
+  color: #8e8e8e;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .sheet {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .platformGrid {
+    gap: 4px;
+  }
+
+  .platformLabel {
+    font-size: 10px;
+  }
+}

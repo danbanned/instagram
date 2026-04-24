@@ -1,0 +1,181 @@
+.page {
+  flex: 1;
+  padding: 32px 24px;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 600px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #262626;
+  margin: 0 0 20px;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #dbdbdb;
+  margin-bottom: 24px;
+  gap: 0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #8e8e8e;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.tab.active {
+  color: #262626;
+  border-bottom-color: #262626;
+}
+
+.statsRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.statSub {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.section {
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 10px;
+}
+
+.sectionHint {
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 0;
+}
+
+.adCard {
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.adCardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 4px;
+}
+
+.adCardSub {
+  font-size: 13px;
+  color: #8e8e8e;
+  margin: 0;
+}
+
+.createAdBtn {
+  background: #0095f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.createAdBtn:hover {
+  background: #0077cc;
+}
+
+.toolItem {
+  font-size: 14px;
+  color: #262626;
+  padding: 10px 0;
+  border-bottom: 1px solid #efefef;
+  cursor: pointer;
+}
+
+.toolItem:last-child {
+  border-bottom: none;
+}
+
+.footer {
+  margin-top: 32px;
+  padding-top: 16px;
+}
+
+.footerLinks {
+  font-size: 12px;
+  color: #8e8e8e;
+  line-height: 1.8;
+  flex-wrap: wrap;
+}
+
+.footerLink {
+  color: #8e8e8e;
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}
+
+.dot {
+  color: #8e8e8e;
+}
+
+.copyright {
+  font-size: 12px;
+  color: #c7c7c7;
+  margin: 8px 0 0;
+}

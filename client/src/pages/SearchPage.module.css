@@ -1,0 +1,177 @@
+.page {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  padding: 32px 24px;
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #262626;
+  margin: 0;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #efefef;
+  border-radius: 10px;
+  padding: 0 12px;
+  margin-bottom: 20px;
+}
+
+.searchIcon {
+  font-size: 14px;
+  margin-right: 8px;
+  opacity: 0.5;
+}
+
+.input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  padding: 10px 0;
+  color: #262626;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #8e8e8e;
+  padding: 4px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.clearAllBtn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0095f6;
+  cursor: pointer;
+}
+
+.emptyHint {
+  font-size: 14px;
+  color: #8e8e8e;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #dbdbdb;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.name {
+  font-size: 13px;
+  color: #8e8e8e;
+}
+
+.followBtn {
+  background: #efefef;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #262626;
+  white-space: nowrap;
+}
+
+.followBtn.following {
+  color: #8e8e8e;
+}
+
+.messagesPromo {
+  border-top: 1px solid #dbdbdb;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.promoTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 6px;
+}
+
+.promoSub {
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 0 0 16px;
+}
+
+.sendBtn {
+  background: #0095f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sendBtn:hover {
+  background: #0077cc;
+}

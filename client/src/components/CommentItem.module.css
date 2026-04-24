@@ -1,0 +1,100 @@
+.commentItem {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.commentContent {
+  flex: 1;
+}
+
+.commentHeader {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.username {
+  font-weight: 600;
+  margin-right: 8px;
+  color: #262626;
+}
+
+.commentText {
+  color: #262626;
+}
+
+.commentActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-top: 4px;
+}
+
+.timestamp {
+  text-transform: lowercase;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: #8e8e8e;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  color: #262626;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.repliesSection {
+  margin-top: 12px;
+}
+
+.viewReplies {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e8e8e;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.line {
+  width: 24px;
+  height: 1px;
+  background: #8e8e8e;
+}
+
+.repliesList {
+  margin-left: 24px;
+}
+
+.likesCount {
+  font-weight: 600;
+}

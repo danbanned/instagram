@@ -1,0 +1,42 @@
+.actionsContainer {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.actionsContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.actionButton {
+  flex: 1;
+  min-width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #efefef;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.actionButton:hover {
+  background: #dbdbdb;
+}
+
+.actionIcon {
+  font-size: 16px;
+}
+
+.actionLabel {
+  white-space: nowrap;
+}

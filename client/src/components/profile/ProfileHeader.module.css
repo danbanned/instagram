@@ -1,0 +1,146 @@
+.profileHeader {
+  margin-bottom: 24px;
+}
+
+.topNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  margin-bottom: 20px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.username {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.shareButton, .editButton, .followButton, .messageButton {
+  padding: 6px 12px;
+  background: #fafafa;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.followButton {
+  background: #0095f6;
+  color: white;
+  border: none;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.profileInfo {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.avatarRing {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarRing.hasStory {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743);
+  padding: 2px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.bioSection {
+  flex: 1;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.bio {
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.website {
+  font-size: 14px;
+  color: #00376b;
+  text-decoration: none;
+}
+
+/* Menu Overlay */
+.menuOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.menuCard {
+  position: absolute;
+  top: 50px;
+  right: 16px;
+  background: white;
+  border-radius: 12px;
+  width: 260px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.menuCard button {
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.menuCard button:hover {
+  background: #fafafa;
+}
+
+.divider {
+  height: 1px;
+  background: #dbdbdb;
+}
+
+.cancelButton {
+  font-weight: 600;
+}

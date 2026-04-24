@@ -1,0 +1,19 @@
+.profilePage {
+  background: white;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 935px;
+  margin: 0 auto;
+  padding: 30px 20px 0;
+}
+
+.loading, .error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: #8e8e8e;
+}

@@ -1,0 +1,37 @@
+.commentForm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.commentInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  padding: 8px 0;
+  color: #262626;
+}
+
+.commentInput::placeholder {
+  color: #8e8e8e;
+}
+
+.postButton {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.postButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.postButton:not(:disabled):hover {
+  color: #00376b;
+}

@@ -1,0 +1,52 @@
+.tabsContainer {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #dbdbdb;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8e8e8e;
+  font-size: 12px;
+  font-weight: 600;
+  position: relative;
+}
+
+.tab.active {
+  color: #262626;
+}
+
+.tabIcon {
+  font-size: 16px;
+}
+
+.tabLabel {
+  text-transform: uppercase;
+}
+
+.activeIndicator {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #262626;
+}
+
+@media (max-width: 768px) {
+  .tabLabel {
+    display: none;
+  }
+  
+  .tabIcon {
+    font-size: 20px;
+  }
+}

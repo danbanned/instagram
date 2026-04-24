@@ -1,0 +1,131 @@
+.statsContainer {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  border-top: 1px solid #dbdbdb;
+  margin-bottom: 12px;
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.statItem:first-child {
+  cursor: default;
+}
+
+.statValue {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.modalHeader h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.modalHeader button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modalList {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 0;
+}
+
+.modalUser {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 12px;
+}
+
+.modalUser img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.modalUser > div {
+  flex: 1;
+}
+
+.modalUsername {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.modalName {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+.followButton {
+  padding: 6px 16px;
+  background: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emptyModal {
+  padding: 40px 20px;
+  text-align: center;
+  color: #8e8e8e;
+}

@@ -1,0 +1,159 @@
+.right-sidebar {
+  width: 320px;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.current-user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-container {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #dbdbdb;
+}
+
+.avatar-container.small {
+  width: 32px;
+  height: 32px;
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8e8e8e;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 700;
+  font-size: 14px;
+  color: #262626;
+}
+
+.full-name {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+.switch-btn, .see-all-btn, .follow-link {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.see-all-btn {
+  color: #262626;
+}
+
+.suggestions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggestions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.suggestions-header .title {
+  color: #8e8e8e;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.suggested-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.suggested-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.suggested-username {
+  font-weight: 700;
+  font-size: 14px;
+  color: #262626;
+}
+
+.followed-by {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.sidebar-footer-links {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-nav {
+  font-size: 12px;
+  color: #dbdbdb;
+  line-height: 1.5;
+}
+
+.footer-nav a {
+  text-decoration: none;
+  color: #dbdbdb;
+}
+
+.copyright {
+  font-size: 12px;
+  color: #dbdbdb;
+}
+
+@media (max-width: 1000px) {
+  .right-sidebar {
+    display: none;
+  }
+}

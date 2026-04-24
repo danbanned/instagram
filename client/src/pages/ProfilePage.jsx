@@ -3,13 +3,12 @@ import { useParams } from 'react-router-dom';
 import { fetchUserProfile, fetchUserPosts } from '../services/userService';
 import { toggleFollow } from '../services/postService';
 import useAuth from '../hooks/useAuth';
-import Navbar from '../components/Navbar';
 import { SafeImage } from '../utils/media';
 import '../styles/ProfilePage.css';
 
 export default function ProfilePage() {
   const { userId } = useParams();
-  const { user: currentUser, logout } = useAuth();
+  const { user: currentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,10 +53,8 @@ export default function ProfilePage() {
   const isOwnProfile = currentUser?.id === user.id;
 
   return (
-    <div className="app-shell">
-      <Navbar user={currentUser} onLogout={logout} />
-      
-      <main className="profile-container">
+    <main className="profile-column">
+      <div className="profile-container">
         <header className="profile-header">
           <div className="profile-avatar-container">
             <SafeImage src={user.avatarUrl} className="profile-avatar" />
@@ -116,7 +113,7 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
