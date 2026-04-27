@@ -6,12 +6,9 @@ export default function ProfileTabs({ activeTab, onTabChange, isOwnProfile }) {
   const tabs = [
     { id: 'posts', label: 'Posts', icon: '📷' },
     { id: 'reels', label: 'Reels', icon: '🎬' },
-    { id: 'saved', label: 'Saved', icon: '📌' },
-    { id: 'reposts', label: 'Reposts', icon: '↪️' },
-    { id: 'tagged', label: 'Tagged', icon: '🏷️' }
+    { id: 'saved', label: 'Saved', icon: '📌' }
   ];
 
-  // Only show Saved tab for own profile
   const visibleTabs = isOwnProfile ? tabs : tabs.filter(t => t.id !== 'saved');
 
   return (

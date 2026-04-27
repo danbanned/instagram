@@ -1,17 +1,12 @@
 .highlightsSection {
-  margin: 20px 0;
-  padding: 12px 0;
+  margin: 0 0 8px;
+  padding: 18px 0 10px;
   border-top: 1px solid #dbdbdb;
+  overflow-x: auto;
 }
 
 .highlightsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #262626;
+  display: none;
 }
 
 .newHighlightBtn {
@@ -26,9 +21,9 @@
 
 .highlightsGrid {
   display: flex;
-  gap: 12px;
+  gap: 18px;
   overflow-x: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
   padding-bottom: 4px;
 }
 
@@ -38,7 +33,7 @@
 
 .highlightItem, .addHighlight {
   flex-shrink: 0;
-  width: 80px;
+  width: 88px;
   text-align: center;
   background: none;
   border: none;
@@ -47,14 +42,15 @@
 }
 
 .highlightCover {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   position: relative;
   overflow: hidden;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   border: 1px solid #dbdbdb;
   padding: 2px;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
 }
 
 .highlightCover img {
@@ -62,6 +58,8 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #fff;
+  background: #efefef;
 }
 
 .highlightOverlay {
@@ -86,24 +84,25 @@
 .highlightName {
   font-size: 12px;
   color: #262626;
-  white-space: nowrap;
+  display: block;
+  max-width: 88px;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block;
+  white-space: nowrap;
 }
 
 .addIcon {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  background: #fafafa;
+  background: #efefef;
   border: 1px solid #dbdbdb;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
-  color: #8e8e8e;
-  margin-bottom: 4px;
+  font-size: 28px;
+  color: #262626;
+  margin-bottom: 8px;
 }
 
 /* Modal Styles */

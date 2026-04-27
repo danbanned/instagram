@@ -1,0 +1,44 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2100;
+}
+
+.menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(320px, calc(100vw - 24px));
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+  z-index: 2101;
+}
+
+.menuItem {
+  width: 100%;
+  border: none;
+  background: #fff;
+  padding: 14px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #262626;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background: #fafafa;
+}
+
+.danger {
+  color: #ed4956;
+  font-weight: 700;
+}
+
+.divider {
+  height: 1px;
+  background: #dbdbdb;
+}

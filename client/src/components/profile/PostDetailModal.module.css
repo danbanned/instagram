@@ -1,0 +1,171 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 2000;
+}
+
+.modal {
+  position: fixed;
+  inset: 24px;
+  max-width: 1100px;
+  max-height: calc(100vh - 48px);
+  margin: auto;
+  background: #fff;
+  border-radius: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(340px, 420px);
+  overflow: hidden;
+  z-index: 2001;
+}
+
+.closeButton {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.mediaPane {
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.contentPane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.header,
+.commentForm {
+  padding: 16px;
+  border-bottom: 1px solid #efefef;
+}
+
+.commentForm {
+  border-top: 1px solid #efefef;
+  border-bottom: none;
+  display: flex;
+  gap: 12px;
+}
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.username,
+.captionUser,
+.commentUser {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.location,
+.timestamp {
+  color: #8e8e8e;
+  font-size: 12px;
+}
+
+.menuButton,
+.iconButton,
+.postButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.captionBlock,
+.actions {
+  padding: 16px;
+}
+
+.captionBlock {
+  border-bottom: 1px solid #efefef;
+  line-height: 1.45;
+}
+
+.commentsSection {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+.comment {
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.emptyComments {
+  color: #8e8e8e;
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.likes {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.commentInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.postButton {
+  color: #0095f6;
+  font-weight: 700;
+}
+
+.postButton:disabled {
+  color: #b2dffc;
+  cursor: default;
+}
+
+@media (max-width: 900px) {
+  .modal {
+    inset: 0;
+    max-height: 100vh;
+    border-radius: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .mediaPane {
+    min-height: 40vh;
+  }
+}

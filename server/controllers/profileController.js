@@ -110,10 +110,22 @@ async function getProfile(req, res) {
       type: post.mediaType,
       mediaUrl: post.mediaUrl,
       caption: post.caption,
+      isPinned: !!post.isPinned,
+      hideLikeCount: !!post.hideLikeCount,
+      commentsDisabled: !!post.commentsDisabled,
+      location: post.location,
       likesCount: post._count.likes,
       commentsCount: post._count.comments,
-      createdAt: post.createdAt
-    }));
+      createdAt: post.createdAt,
+      user: {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatarUrl
+      }
+    })).sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
     res.json({
       success: true,
@@ -150,10 +162,17 @@ async function getReels(req, res) {
       type: 'video',
       mediaUrl: post.mediaUrl,
       caption: post.caption,
+      isPinned: !!post.isPinned,
+      hideLikeCount: !!post.hideLikeCount,
+      commentsDisabled: !!post.commentsDisabled,
+      location: post.location,
       likesCount: post._count.likes,
       commentsCount: post._count.comments,
       createdAt: post.createdAt
-    }));
+    })).sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
     res.json({ success: true, items });
 
@@ -196,9 +215,14 @@ async function getSavedPosts(req, res) {
       type: saved.post.mediaType,
       mediaUrl: saved.post.mediaUrl,
       caption: saved.post.caption,
+      isPinned: !!saved.post.isPinned,
+      hideLikeCount: !!saved.post.hideLikeCount,
+      commentsDisabled: !!saved.post.commentsDisabled,
+      location: saved.post.location,
       likesCount: saved.post._count.likes,
       commentsCount: saved.post._count.comments,
       user: {
+        id: saved.post.authorId,
         username: saved.post.author.username,
         avatar: saved.post.author.avatarUrl
       },
@@ -303,6 +327,8 @@ async function getTaggedPosts(req, res) {
   }
 }
 
+
+
 /**
  * @desc    Update user profile
  * @route   PUT /api/profile/update
@@ -342,11 +368,73 @@ async function updateProfile(req, res) {
   }
 }
 
+
+/**
+ * @desc    Upload profile picture/avatar
+ * @route   POST /api/profile/avatar
+ * @access  Private
+ */
+async function uploadAvatar(req, res) {
+  try {
+    // Check if file was uploaded by multer
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No file uploaded' 
+      });
+    }
+
+    const userId = req.user.id;
+    
+    // Build avatar URL based on your upload structure
+    // Your upload middleware saves to /uploads/ with UUID filename
+    const avatarUrl = `/uploads/${req.file.filename}`;
+
+    // Update user's avatar
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { 
+        avatarUrl: avatarUrl,
+        updatedAt: new Date()
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        avatarUrl: true,
+        profile: {
+          select: {
+            name: true,
+            bio: true,
+            website: true
+          }
+        }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile picture updated successfully',
+      avatarUrl: avatarUrl,
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to upload profile picture' 
+    });
+  }
+}
+
 module.exports = {
   getProfile,
   getReels,
   getSavedPosts,
   getReposts,
   getTaggedPosts,
-  updateProfile
+  updateProfile,
+  uploadAvatar
 };
+

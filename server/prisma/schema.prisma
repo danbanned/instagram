@@ -67,6 +67,7 @@ model Post {
   mediaUrl         String   @map("media_url")
   mediaType        String   @default("image") @map("media_type") @db.VarChar(10)
   location         String?
+  isPinned         Boolean  @default(false) @map("is_pinned")
   isAIGenerated    Boolean  @default(false) @map("is_ai_generated")
   altText          String?  @map("alt_text")
   isCollaborative  Boolean  @default(false) @map("is_collaborative")

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import styles from './PostOptionsMenu.module.css';
 
-export default function PostOptionsMenu({ post, isOpen, onClose, onAction }) {
+export default function PostOptionsMenu({ post, isOpen, isOwnProfile, onClose, onAction }) {
   const menuRef = useRef(null);
 
-  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -19,54 +19,53 @@ export default function PostOptionsMenu({ post, isOpen, onClose, onAction }) {
     }
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !post) return null;
 
-  const menuItems = [
-    { id: 'report', label: 'Report', icon: '📋', danger: false },
-    { id: 'unfollow', label: 'Unfollow', icon: '🚫', danger: false },
-    { id: 'favorite', label: 'Add to favorites', icon: '⭐', danger: false },
-    { id: 'goToPost', label: 'Go to post', icon: '🔗', danger: false },
-    { id: 'share', label: 'Share to...', icon: '📤', danger: false },
-    { id: 'copyLink', label: 'Copy link', icon: '🔗', danger: false },
-    { id: 'embed', label: 'Embed', icon: '📦', danger: false },
-    { id: 'about', label: 'About this account', icon: 'ℹ️', danger: false },
+  const ownItems = [
+    { id: 'delete', label: 'Delete', danger: true },
+    { id: 'edit', label: 'Edit' },
+    { id: 'toggleLikeVisibility', label: post.hideLikeCount ? 'Show like count to others' : 'Hide like count to others' },
+    { id: 'toggleComments', label: post.commentsDisabled ? 'Turn on commenting' : 'Turn off commenting' },
+    { id: 'goToPost', label: 'Go to post' },
+    { id: 'share', label: 'Share to...' },
+    { id: 'copyLink', label: 'Copy link' },
+    { id: 'embed', label: 'Embed' },
+    { id: 'about', label: 'About this account' },
+    { id: 'pin', label: post.isPinned ? 'Unpin from profile' : 'Pin to profile' },
   ];
 
+  const publicItems = [
+    { id: 'goToPost', label: 'Go to post' },
+    { id: 'share', label: 'Share to...' },
+    { id: 'copyLink', label: 'Copy link' },
+    { id: 'embed', label: 'Embed' },
+    { id: 'about', label: 'About this account' },
+  ];
+
+  const items = isOwnProfile ? ownItems : publicItems;
+
   const handleAction = (actionId) => {
-    onAction(actionId, post);
+    onAction?.(actionId, post);
     onClose();
   };
 
   return (
     <>
-      <div className="post-options-overlay" onClick={onClose} />
-      <div className="post-options-menu" ref={menuRef}>
-        {/* Header with author info */}
-        <div className="menu-header">
-          <span className="author-name">{post.author?.username}</span>
-          <span className="dot-separator">·</span>
-          <span className="post-time">{post.timeAgo || '1d'}</span>
-        </div>
-
-        <div className="menu-divider"></div>
-
-        {/* Menu items */}
-        {menuItems.map((item) => (
+      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.menu} ref={menuRef}>
+        {items.map((item) => (
           <button
             key={item.id}
-            className={`menu-item ${item.danger ? 'danger' : ''}`}
+            type="button"
+            className={`${styles.menuItem} ${item.danger ? styles.danger : ''}`}
             onClick={() => handleAction(item.id)}
           >
-            <span className="menu-icon">{item.icon}</span>
-            <span className="menu-label">{item.label}</span>
+            {item.label}
           </button>
         ))}
-
-        <div className="menu-divider"></div>
-
-        {/* Cancel button */}
-        <button className="menu-item cancel" onClick={onClose}>
-          <span className="menu-label">Cancel</span>
+        <div className={styles.divider} />
+        <button type="button" className={styles.menuItem} onClick={onClose}>
+          Cancel
         </button>
       </div>
     </>

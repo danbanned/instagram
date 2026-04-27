@@ -2,11 +2,22 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SafeImage } from '../../utils/media';
 import styles from './HighlightsSection.module.css';
 
 export default function HighlightsSection({ highlights = [], isOwnProfile }) {
   const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const demoHighlights = [
+    { id: 'family', name: 'Family', coverUrl: '' },
+    { id: 'family-ch', name: 'Family ch...', coverUrl: '' },
+    { id: 'friends', name: 'friends 🎉', coverUrl: '' },
+    { id: 'years-ago', name: "Year's ago", coverUrl: '' },
+    { id: 'travel', name: 'travel', coverUrl: '' },
+    { id: 'little-sister', name: 'little sister', coverUrl: '' },
+    { id: 'sister', name: 'Sister🦋', coverUrl: '' },
+  ];
+  const visibleHighlights = highlights.length ? highlights : (isOwnProfile ? demoHighlights : []);
 
   const handleHighlightClick = (highlight) => {
     navigate(`/highlights/${highlight.id}`);
@@ -16,7 +27,7 @@ export default function HighlightsSection({ highlights = [], isOwnProfile }) {
     setShowCreateModal(true);
   };
 
-  if (highlights.length === 0 && !isOwnProfile) return null;
+  if (visibleHighlights.length === 0 && !isOwnProfile) return null;
 
   return (
     <div className={styles.highlightsSection}>
@@ -30,14 +41,14 @@ export default function HighlightsSection({ highlights = [], isOwnProfile }) {
       </div>
 
       <div className={styles.highlightsGrid}>
-        {highlights.map(highlight => (
+        {visibleHighlights.map(highlight => (
           <button 
             key={highlight.id}
             className={styles.highlightItem}
             onClick={() => handleHighlightClick(highlight)}
           >
             <div className={styles.highlightCover}>
-              <img src={highlight.coverUrl || '/default-highlight.png'} alt={highlight.name} />
+              <SafeImage src={highlight.coverUrl || '/default-highlight.png'} alt={highlight.name} />
               <div className={styles.highlightOverlay}>
                 <span>📌</span>
               </div>

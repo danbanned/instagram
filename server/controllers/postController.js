@@ -172,4 +172,65 @@ async function recordShare(req, res) {
   res.json({ success: true });
 }
 
-module.exports = { createPost, getFeed, toggleLike, addComment, getComments, deleteComment, toggleCommentLike, toggleSave, followUser, recordShare };
+async function getPost(req, res) {
+  const post = await Post.findById(req.params.postId);
+  if (!post) return res.status(404).json({ message: 'Post not found' });
+  res.json({ post });
+}
+
+async function deletePost(req, res) {
+  try {
+    await Post.deleteById(req.params.postId, req.user.id);
+    cache.del(`feed:${req.user.id}`);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+}
+
+async function togglePin(req, res) {
+  try {
+    const current = await Post.findById(req.params.postId);
+    if (!current) return res.status(404).json({ message: 'Post not found' });
+
+    const updated = await Post.updateById(req.params.postId, req.user.id, {
+      isPinned: typeof req.body?.pinned === 'boolean' ? req.body.pinned : !current.isPinned,
+    });
+
+    res.json({ success: true, post: updated });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+}
+
+async function updatePostSettings(req, res) {
+  try {
+    const updates = {};
+    if (typeof req.body.caption === 'string') updates.caption = req.body.caption;
+    if (typeof req.body.hideLikeCount === 'boolean') updates.hideLikeCount = req.body.hideLikeCount;
+    if (typeof req.body.commentsDisabled === 'boolean') updates.commentsDisabled = req.body.commentsDisabled;
+
+    const updated = await Post.updateById(req.params.postId, req.user.id, updates);
+    cache.del(`feed:${req.user.id}`);
+    res.json({ success: true, post: updated });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+}
+
+module.exports = {
+  createPost,
+  getFeed,
+  getPost,
+  deletePost,
+  toggleLike,
+  addComment,
+  getComments,
+  deleteComment,
+  toggleCommentLike,
+  toggleSave,
+  togglePin,
+  updatePostSettings,
+  followUser,
+  recordShare,
+};

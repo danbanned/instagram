@@ -16,7 +16,10 @@ function transformPost(post, likedByMe = false, savedByMe = false) {
     mediaUrl: post.mediaUrl,
     mediaType: post.mediaType,
     location: post.location || null,
+    isPinned: !!post.isPinned,
     isAIGenerated: post.isAIGenerated || false,
+    hideLikeCount: !!post.hideLikeCount,
+    commentsDisabled: !!post.commentsDisabled,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
     likesCount: post._count.likes,
@@ -56,6 +59,27 @@ async function create({ authorId, caption, mediaUrl, mediaType, location, altTex
 async function findById(id) {
   const post = await prisma.post.findUnique({ where: { id }, include: POST_INCLUDE });
   return post ? transformPost(post) : null;
+}
+
+async function deleteById(id, userId) {
+  const post = await prisma.post.findUnique({ where: { id }, select: { id: true, authorId: true } });
+  if (!post) throw Object.assign(new Error('Post not found'), { status: 404 });
+  if (post.authorId !== userId) throw Object.assign(new Error('Unauthorized'), { status: 403 });
+  await prisma.post.delete({ where: { id } });
+}
+
+async function updateById(id, userId, data) {
+  const post = await prisma.post.findUnique({ where: { id }, select: { id: true, authorId: true } });
+  if (!post) throw Object.assign(new Error('Post not found'), { status: 404 });
+  if (post.authorId !== userId) throw Object.assign(new Error('Unauthorized'), { status: 403 });
+
+  const updated = await prisma.post.update({
+    where: { id },
+    data,
+    include: POST_INCLUDE,
+  });
+
+  return transformPost(updated);
 }
 
 async function getFeed(userId, { cursor, limit = 10 } = {}) {
@@ -257,6 +281,8 @@ async function getByUser(userId) {
 module.exports = {
   create,
   findById,
+  deleteById,
+  updateById,
   getFeed,
   getByUser,
   isLikedBy,
