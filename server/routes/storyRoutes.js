@@ -10,11 +10,13 @@ const {
   replyToStory,
   addReaction,
   trackView,
+  getArchivedStories,
 } = require('../controllers/storyController');
 
 const router = express.Router();
 
 router.get('/tray', protect, getStoryTray);
+router.get('/archived', protect, getArchivedStories);
 router.get('/user/:userId', protect, getUserStories);
 router.post('/', protect, upload.single('media'), createStory);
 router.post('/:storyId/seen', protect, markStorySeen);

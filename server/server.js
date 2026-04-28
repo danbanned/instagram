@@ -15,6 +15,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const storyRoutes = require('./routes/storyRoutes');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const highlightRoutes = require('./routes/highlightRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -72,6 +73,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/highlights', highlightRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

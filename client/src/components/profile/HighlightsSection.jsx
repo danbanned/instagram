@@ -1,101 +1,98 @@
 'use client';
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { SafeImage } from '../../utils/media';
+import AddHighlightModal from './AddHighlightModal';
+import HighlightViewer from './HighlightViewer';
+import { deleteHighlight } from '../../services/highlightService';
 import styles from './HighlightsSection.module.css';
 
-export default function HighlightsSection({ highlights = [], isOwnProfile }) {
-  const navigate = useNavigate();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const demoHighlights = [
-    { id: 'family', name: 'Family', coverUrl: '' },
-    { id: 'family-ch', name: 'Family ch...', coverUrl: '' },
-    { id: 'friends', name: 'friends 🎉', coverUrl: '' },
-    { id: 'years-ago', name: "Year's ago", coverUrl: '' },
-    { id: 'travel', name: 'travel', coverUrl: '' },
-    { id: 'little-sister', name: 'little sister', coverUrl: '' },
-    { id: 'sister', name: 'Sister🦋', coverUrl: '' },
-  ];
-  const visibleHighlights = highlights.length ? highlights : (isOwnProfile ? demoHighlights : []);
+export default function HighlightsSection({ highlights = [], isOwnProfile, onUpdate }) {
+  const [selectedHighlight, setSelectedHighlight] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingHighlight, setEditingHighlight] = useState(null);
 
   const handleHighlightClick = (highlight) => {
-    navigate(`/highlights/${highlight.id}`);
+    setSelectedHighlight(highlight);
   };
 
-  const handleCreateHighlight = () => {
-    setShowCreateModal(true);
+  const handleEditHighlight = (e, highlight) => {
+    e.stopPropagation();
+    setEditingHighlight(highlight);
+    setShowAddModal(true);
   };
 
-  if (visibleHighlights.length === 0 && !isOwnProfile) return null;
+  const handleDeleteHighlight = async (e, highlightId) => {
+    e.stopPropagation();
+    if (window.confirm('Delete this highlight?')) {
+      try {
+        await deleteHighlight(highlightId);
+        onUpdate();
+      } catch (error) {
+        console.error('Failed to delete highlight:', error);
+      }
+    }
+  };
+
+  const handleSaveHighlight = () => {
+    onUpdate();
+    setShowAddModal(false);
+    setEditingHighlight(null);
+  };
+
+  if (highlights.length === 0 && !isOwnProfile) return null;
 
   return (
     <div className={styles.highlightsSection}>
-      <div className={styles.highlightsHeader}>
-        <span>Highlights</span>
-        {isOwnProfile && (
-          <button className={styles.newHighlightBtn} onClick={handleCreateHighlight}>
-            New
-          </button>
-        )}
-      </div>
-
       <div className={styles.highlightsGrid}>
-        {visibleHighlights.map(highlight => (
-          <button 
-            key={highlight.id}
-            className={styles.highlightItem}
-            onClick={() => handleHighlightClick(highlight)}
-          >
-            <div className={styles.highlightCover}>
-              <SafeImage src={highlight.coverUrl || '/default-highlight.png'} alt={highlight.name} />
-              <div className={styles.highlightOverlay}>
-                <span>📌</span>
+        {highlights.map(highlight => (
+          <div key={highlight.id} className={styles.highlightWrapper}>
+            <button 
+              className={styles.highlightItem}
+              onClick={() => handleHighlightClick(highlight)}
+            >
+              <div className={styles.highlightRing}>
+                <div className={styles.highlightCover}>
+                  <SafeImage src={highlight.coverUrl || '/default-highlight.png'} alt={highlight.name} />
+                </div>
               </div>
-            </div>
-            <span className={styles.highlightName}>{highlight.name}</span>
-          </button>
+              <span className={styles.highlightName}>{highlight.name}</span>
+            </button>
+            
+            {isOwnProfile && (
+              <div className={styles.highlightActions}>
+                <button className={styles.editBtn} onClick={(e) => handleEditHighlight(e, highlight)}>✏️</button>
+                <button className={styles.deleteBtn} onClick={(e) => handleDeleteHighlight(e, highlight.id)}>🗑️</button>
+              </div>
+            )}
+          </div>
         ))}
 
         {isOwnProfile && (
-          <button className={styles.addHighlight} onClick={handleCreateHighlight}>
-            <div className={styles.addIcon}>+</div>
+          <button className={styles.addHighlight} onClick={() => setShowAddModal(true)}>
+            <div className={styles.addRing}>
+              <div className={styles.addIcon}>+</div>
+            </div>
             <span>New</span>
           </button>
         )}
       </div>
 
-      {/* Create Highlight Modal */}
-      {showCreateModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowCreateModal(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3>Create Highlight</h3>
-              <button onClick={() => setShowCreateModal(false)}>×</button>
-            </div>
-            <div className={styles.modalContent}>
-              <input 
-                type="text" 
-                placeholder="Highlight name"
-                className={styles.highlightNameInput}
-              />
-              <div className={styles.selectStories}>
-                <p>Select stories to add:</p>
-                <div className={styles.storiesList}>
-                  {/* List of archived stories would go here */}
-                  <div className={styles.storyOption}>
-                    <input type="checkbox" id="story1" />
-                    <label htmlFor="story1">Story from April 22</label>
-                  </div>
-                </div>
-              </div>
-              <button className={styles.createButton} onClick={() => setShowCreateModal(false)}>
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddHighlightModal 
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditingHighlight(null);
+        }}
+        onSave={handleSaveHighlight}
+        editingHighlight={editingHighlight}
+      />
+
+      <HighlightViewer 
+        highlight={selectedHighlight}
+        isOpen={!!selectedHighlight}
+        onClose={() => setSelectedHighlight(null)}
+      />
     </div>
   );
 }

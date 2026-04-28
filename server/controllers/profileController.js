@@ -337,8 +337,18 @@ async function getTaggedPosts(req, res) {
 async function updateProfile(req, res) {
   try {
     const userId = req.user.id;
-    const { name, bio, website, phoneNumber, gender, isPrivate } = req.body;
+    const { name, bio, website, phoneNumber, gender, isPrivate, avatar } = req.body;
 
+    // Update User model (bio and avatarUrl)
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        bio: bio || '',
+        avatarUrl: avatar || ''
+      }
+    });
+
+    // Update or create Profile model
     const profile = await prisma.profile.upsert({
       where: { userId },
       update: {
@@ -387,8 +397,8 @@ async function uploadAvatar(req, res) {
     const userId = req.user.id;
     
     // Build avatar URL based on your upload structure
-    // Your upload middleware saves to /uploads/ with UUID filename
-    const avatarUrl = `/uploads/${req.file.filename}`;
+    // Your upload middleware saves to /uploads/avatars with UUID filename
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
 
     // Update user's avatar
     const updatedUser = await prisma.user.update({

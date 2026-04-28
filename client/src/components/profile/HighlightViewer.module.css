@@ -1,0 +1,127 @@
+.viewerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.viewerContainer {
+  width: 100%;
+  max-width: 450px;
+  height: 90vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progressContainer {
+  display: flex;
+  padding: 8px;
+  gap: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.progressBarBackground {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: white;
+  width: 0;
+}
+
+.viewerHeader {
+  padding: 20px 16px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.highlightMiniCover {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.highlightName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.content {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mediaWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.navLeft, .navRight {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 30%;
+  cursor: pointer;
+}
+
+.navLeft {
+  left: 0;
+}
+
+.navRight {
+  right: 0;
+}

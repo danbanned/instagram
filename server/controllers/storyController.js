@@ -139,4 +139,28 @@ async function addReaction(req, res) {
   }
 }
 
-module.exports = { getStoryTray, markStorySeen, trackView, getUserStories, createStory, deleteStory, replyToStory, addReaction };
+async function getArchivedStories(req, res) {
+  try {
+    const userId = req.user.id;
+    const stories = await prisma.story.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json({ success: true, stories });
+  } catch (err) {
+    console.error('Archived stories error:', err);
+    res.status(500).json({ error: 'Failed to load archived stories' });
+  }
+}
+
+module.exports = { 
+  getStoryTray, 
+  markStorySeen, 
+  trackView, 
+  getUserStories, 
+  createStory, 
+  deleteStory, 
+  replyToStory, 
+  addReaction,
+  getArchivedStories 
+};

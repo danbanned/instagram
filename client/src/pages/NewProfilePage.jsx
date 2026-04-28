@@ -171,6 +171,7 @@ export default function NewProfilePage() {
         <HighlightsSection 
           highlights={profile.highlights}
           isOwnProfile={isOwnProfile}
+          onUpdate={fetchProfile}
         />
         
         <ProfileTabs 

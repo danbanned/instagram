@@ -78,7 +78,7 @@ export default function EditProfileModal({ profile, isOpen, onClose, onSave }) {
     formData.append('avatar', avatarFile);
     
     try {
-      const response = await api.post('/profile/upload-avatar', formData, {
+      const response = await api.post('/profile/avatar', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       return response.data.avatarUrl;

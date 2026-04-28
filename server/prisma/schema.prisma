@@ -31,7 +31,6 @@ model User {
   storyViews            StoryView[]
   storyReplies          StoryReply[]
   storyReactions        StoryReaction[]
-  storyHighlights       StoryHighlight[]
   highlights            Highlight[]
   reposts               Repost[]
   postTags              PostTag[]
@@ -188,7 +187,7 @@ model Story {
   expiresAt         DateTime  @map("expires_at") @db.Timestamptz(6)
 
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  highlight StoryHighlight? @relation(fields: [highlightId], references: [id], onDelete: SetNull)
+  highlight Highlight?      @relation(fields: [highlightId], references: [id], onDelete: SetNull)
   views     StoryView[]
   replies   StoryReply[]
   reactions StoryReaction[]
@@ -245,34 +244,21 @@ model StoryReaction {
   @@map("story_reactions")
 }
 
-model StoryHighlight {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  name      String
-  coverUrl  String?  @map("cover_url")
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stories Story[]
-
-  @@index([userId])
-  @@map("story_highlights")
-}
-
 model Highlight {
-  id        String   @id @default(cuid())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   coverUrl  String?  @map("cover_url")
-  stories   String[] // Array of story IDs
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  stories Story[]
 
   @@index([userId])
   @@map("highlights")
 }
+
 
 model PostAnalytics {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
