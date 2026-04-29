@@ -3,18 +3,12 @@
 import { useState } from 'react';
 import { SafeImage } from '../../utils/media';
 import AddHighlightModal from './AddHighlightModal';
-import HighlightViewer from './HighlightViewer';
 import { deleteHighlight } from '../../services/highlightService';
 import styles from './HighlightsSection.module.css';
 
-export default function HighlightsSection({ highlights = [], isOwnProfile, onUpdate }) {
-  const [selectedHighlight, setSelectedHighlight] = useState(null);
+export default function HighlightsSection({ highlights = [], isOwnProfile, onUpdate, onHighlightClick }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingHighlight, setEditingHighlight] = useState(null);
-
-  const handleHighlightClick = (highlight) => {
-    setSelectedHighlight(highlight);
-  };
 
   const handleEditHighlight = (e, highlight) => {
     e.stopPropagation();
@@ -49,7 +43,7 @@ export default function HighlightsSection({ highlights = [], isOwnProfile, onUpd
           <div key={highlight.id} className={styles.highlightWrapper}>
             <button 
               className={styles.highlightItem}
-              onClick={() => handleHighlightClick(highlight)}
+              onClick={() => onHighlightClick(highlight)}
             >
               <div className={styles.highlightRing}>
                 <div className={styles.highlightCover}>
@@ -86,12 +80,6 @@ export default function HighlightsSection({ highlights = [], isOwnProfile, onUpd
         }}
         onSave={handleSaveHighlight}
         editingHighlight={editingHighlight}
-      />
-
-      <HighlightViewer 
-        highlight={selectedHighlight}
-        isOpen={!!selectedHighlight}
-        onClose={() => setSelectedHighlight(null)}
       />
     </div>
   );

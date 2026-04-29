@@ -82,19 +82,61 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
           </span>
         </div>
 
+        <div className={styles.followerContext}>
+          <span className={styles.followersText}>
+            Followed by <strong>experience</strong>, <strong>_interdensity</strong> and <strong>20 others</strong>
+          </span>
+        </div>
+
         <div className={styles.bioSection}>
           <div className={styles.name}>{profile.name || 'Daniel Johnson'}</div>
           <p className={styles.bio}>{profile.bio || 'Leave me be 2020-2021\nAlmost there, 2022'}</p>
-          {profile.website && (
-            <a
-              href={profile.website}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.website}
-            >
-              {profile.website.replace('https://', '')}
-            </a>
+          
+          <div className={styles.contactContainer}>
+            {profile.email && (
+              <div className={styles.contactItem}>
+                <a href={`mailto:${profile.email}`} className={styles.contactLink}>
+                  📧 {profile.email}
+                </a>
+              </div>
+            )}
+            {profile.phoneNumber && (
+              <div className={styles.contactItem}>
+                <span className={styles.contactText}>📞 {profile.phoneNumber}</span>
+              </div>
+            )}
+            {profile.website && (
+              <div className={styles.contactItem}>
+                <a
+                  href={profile.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.contactLink}
+                >
+                  🔗 {profile.website.replace('https://', '')}
+                </a>
+              </div>
+            )}
+            <div className={styles.contactItem}>
+              <span className={styles.contactText}>📅 Joined {new Date(profile.createdAt || Date.now()).toLocaleDateString()}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.actionButtonsRow}>
+          {!isOwnProfile && (
+            <>
+              <button className={styles.followingDropdownBtn}>Following ▼</button>
+              <button className={styles.messageBtn}>Message</button>
+              <button className={styles.emailDropdownBtn}>Email ▼</button>
+            </>
           )}
+        </div>
+
+        <div className={styles.actionChips}>
+          {(profile.actionButtons || ['results', 'podcast', 'free trainings', 'about']).map((btn, idx) => (
+            <button key={idx} className={styles.actionChip}>{btn}</button>
+          ))}
         </div>
 
         {isOwnProfile && (

@@ -1,4 +1,14 @@
-const prisma = require('../config/prisma');
+const { PrismaClient } = require('@prisma/client');
+
+let prisma;
+
+if (!global.prisma) {
+  global.prisma = new PrismaClient();
+}
+
+prisma = global.prisma;
+
+module.exports = prisma
 
 /**
  * @desc    Get user profile data
@@ -79,6 +89,9 @@ async function getProfile(req, res) {
       avatar: user.avatarUrl,
       bio: user.profile?.bio || user.bio,
       website: user.profile?.website,
+      email: user.profile?.email,
+      phoneNumber: user.profile?.phoneNumber,
+      actionButtons: user.profile?.actionButtons,
       isPrivate: user.profile?.isPrivate || false,
       isBusiness: user.profile?.isBusiness || false,
       hasStory: !!activeStory,
@@ -337,7 +350,7 @@ async function getTaggedPosts(req, res) {
 async function updateProfile(req, res) {
   try {
     const userId = req.user.id;
-    const { name, bio, website, phoneNumber, gender, isPrivate, avatar } = req.body;
+    const { name, bio, website, phoneNumber, email, actionButtons, gender, isPrivate, avatar } = req.body;
 
     // Update User model (bio and avatarUrl)
     await prisma.user.update({
@@ -356,6 +369,8 @@ async function updateProfile(req, res) {
         bio,
         website,
         phoneNumber,
+        email,
+        actionButtons,
         gender,
         isPrivate
       },
@@ -365,6 +380,8 @@ async function updateProfile(req, res) {
         bio,
         website,
         phoneNumber,
+        email,
+        actionButtons,
         gender,
         isPrivate
       }

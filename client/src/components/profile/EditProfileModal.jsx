@@ -12,9 +12,17 @@ export default function EditProfileModal({ profile, isOpen, onClose, onSave }) {
     website: profile.website || '',
     email: profile.email || '',
     phoneNumber: profile.phoneNumber || '',
+    actionButtons: profile.actionButtons || ['results', 'podcast', 'free trainings', 'about'],
     gender: profile.gender || '',
     isPrivate: profile.isPrivate || false
   });
+
+  const formatPhoneNumber = (value) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+  };
   
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar || '/default-avatar.png');
@@ -28,6 +36,7 @@ export default function EditProfileModal({ profile, isOpen, onClose, onSave }) {
       website: profile.website || '',
       email: profile.email || '',
       phoneNumber: profile.phoneNumber || '',
+      actionButtons: profile.actionButtons || ['results', 'podcast', 'free trainings', 'about'],
       gender: profile.gender || '',
       isPrivate: profile.isPrivate || false
     });
@@ -185,10 +194,58 @@ export default function EditProfileModal({ profile, isOpen, onClose, onSave }) {
             <input
               type="tel"
               value={formData.phoneNumber}
-              onChange={(e) => handleChange('phoneNumber', e.target.value)}
-              placeholder="Phone number"
+              onChange={(e) => handleChange('phoneNumber', formatPhoneNumber(e.target.value))}
+              placeholder="(555) 123-4567"
+              maxLength={14}
               disabled={uploading}
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Public Email (displayed in bio)</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              placeholder="Email for bio"
+              disabled={uploading}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Action Buttons</label>
+            <div className={styles.actionButtonsEditor}>
+              {formData.actionButtons.map((btn, idx) => (
+                <div key={idx} className={styles.actionButtonInputRow}>
+                  <input
+                    type="text"
+                    value={btn}
+                    onChange={(e) => {
+                      const newBtns = [...formData.actionButtons];
+                      newBtns[idx] = e.target.value;
+                      handleChange('actionButtons', newBtns);
+                    }}
+                  />
+                  <button 
+                    type="button"
+                    className={styles.removeBtn}
+                    onClick={() => {
+                      const newBtns = formData.actionButtons.filter((_, i) => i !== idx);
+                      handleChange('actionButtons', newBtns);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button 
+                type="button"
+                className={styles.addBtn}
+                onClick={() => handleChange('actionButtons', [...formData.actionButtons, ''])}
+              >
+                + Add Action Button
+              </button>
+            </div>
           </div>
 
           <div className={styles.formGroup}>

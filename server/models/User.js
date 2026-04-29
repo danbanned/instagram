@@ -1,7 +1,10 @@
 const prisma = require('../config/prisma');
 
 async function findById(id) {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({ 
+    where: { id },
+    include: { profile: true }
+  });
   if (!user) return null;
   const { password, ...rest } = user;
   return rest;

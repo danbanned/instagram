@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import HighlightsSection from '../components/profile/HighlightsSection';
@@ -7,10 +7,12 @@ import ProfileTabs from '../components/profile/ProfileTabs';
 import PostGrid from '../components/profile/PostGrid';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import PostDetailModal from '../components/profile/PostDetailModal';
+import HighlightViewer from '../components/profile/HighlightViewer';
 import styles from './NewProfilePage.module.css';
 
 export default function NewProfilePage() {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState('posts');
@@ -18,7 +20,8 @@ export default function NewProfilePage() {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showArchiveMessage, setShowArchiveMessage] = useState(false);
+  const [selectedHighlight, setSelectedHighlight] = useState(null);
+  const [showHighlightViewer, setShowHighlightViewer] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -154,6 +157,15 @@ export default function NewProfilePage() {
     { id: 'family', name: 'Family', count: 12 },
   ];
 
+  const handleHighlightClick = (highlight) => {
+    setSelectedHighlight(highlight);
+    setShowHighlightViewer(true);
+  };
+
+  const handleUpdateHighlights = async () => {
+    await fetchProfile();
+  };
+
   if (loading) return <div className={styles.loading}>Loading profile...</div>;
   if (!profile) return <div className={styles.error}>Profile not found</div>;
 
@@ -165,13 +177,14 @@ export default function NewProfilePage() {
           stats={profile.stats}
           isOwnProfile={isOwnProfile}
           onOpenEditProfile={() => setShowEditModal(true)}
-          onOpenArchive={() => setShowArchiveMessage(true)}
+          onOpenArchive={() => navigate('/archive')}
         />
         
         <HighlightsSection 
           highlights={profile.highlights}
           isOwnProfile={isOwnProfile}
-          onUpdate={fetchProfile}
+          onUpdate={handleUpdateHighlights}
+          onHighlightClick={handleHighlightClick}
         />
         
         <ProfileTabs 
@@ -233,11 +246,11 @@ export default function NewProfilePage() {
         onCommentSubmit={handleCommentSubmit}
       />
 
-      {showArchiveMessage && (
-        <div className={styles.archiveBanner}>
-          Archive view is not routed yet. The button is wired and ready for the archive screen when that route exists.
-          <button type="button" onClick={() => setShowArchiveMessage(false)}>Dismiss</button>
-        </div>
+      {showHighlightViewer && selectedHighlight && (
+        <HighlightViewer
+          highlight={selectedHighlight}
+          onClose={() => setShowHighlightViewer(false)}
+        />
       )}
     </div>
   );

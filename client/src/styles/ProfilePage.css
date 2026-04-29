@@ -9,10 +9,26 @@
   margin-bottom: 44px;
 }
 
-.profile-avatar-container {
+.profile-avatar-section {
   flex: 1;
   display: flex;
   justify-content: center;
+}
+
+.profile-story-ring {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.profile-story-ring.has-story {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
 }
 
 .profile-avatar {
@@ -20,6 +36,134 @@
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
+  border: 4px solid #fff;
+}
+
+.story-indicator {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 14px;
+  height: 14px;
+  background: #0095f6;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: transparent;
+  font-size: 0;
+}
+
+.profile-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  color: #262626;
+}
+
+.message-btn, .email-action-btn {
+  padding: 7px 16px;
+  background: #efefef;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.message-btn:hover, .email-action-btn:hover {
+  background: #dbdbdb;
+}
+
+.follower-context {
+  margin: 12px 0;
+  font-size: 14px;
+  color: #262626;
+}
+
+.followers-text strong {
+  font-weight: 600;
+}
+
+.full-name {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.bio-text {
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.email-link {
+  margin: 8px 0;
+}
+
+.email-address {
+  color: #00376b;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-buttons-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.action-chip {
+  padding: 8px 16px;
+  background: #e0e0e0;
+  border: 1px solid #dbdbdb;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-chip:hover {
+  background: #d0d0d0;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .action-chip {
+  background: #3a3a3a;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .action-chip:hover {
+  background: #4a4a4a;
+}
+
+.about-section {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.about-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #efefef;
+}
+
+.about-item span:first-child {
+  font-weight: 600;
+  color: #8e8e8e;
 }
 
 .profile-info {

@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
+const prisma = require('../config/prisma');
 
 
 async function getUserProfile(req, res) {
@@ -15,6 +16,14 @@ async function getUserProfile(req, res) {
     const followingCount = await User.getFollowingCount(user.id);
     const postsCount = await User.getPostsCount(user.id);
 
+    // Check for active stories
+    const activeStories = await prisma.story.findMany({
+      where: {
+        userId: user.id,
+        expiresAt: { gt: new Date() }
+      }
+    });
+
     res.json({ 
       success: true, 
       user: {
@@ -22,7 +31,8 @@ async function getUserProfile(req, res) {
         isFollowing,
         followersCount,
         followingCount,
-        postsCount
+        postsCount,
+        hasActiveStory: activeStories.length > 0
       }
     });
   } catch (err) {

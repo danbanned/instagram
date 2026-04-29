@@ -1,50 +1,47 @@
 :root {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: #f4f6f8;
-  color: #111827;
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --text-primary: #262626;
+  --text-secondary: #8e8e8e;
+  --border-color: #dbdbdb;
+  --nav-bg: #ffffff;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #121212;
+  --text-primary: #ffffff;
+  --text-secondary: #a8a8a8;
+  --border-color: #333333;
+  --nav-bg: #000000;
+  --card-bg: #121212;
+  --input-bg: #121212;
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; }
-
-/* Navbar styles live in src/styles/Navbar.css */
-/* .app-shell rules are defined in the responsive section below */
-
-.content-grid {
-  max-width: 1100px;
-  margin: 20px auto;
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  padding: 0 16px;
+body { 
+  margin: 0; 
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #dbe2ea;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
 }
 
-.feed-list { display: grid; gap: 16px; }
-
-.post-card img,
-.post-card video {
-  width: 100%;
-  border-radius: 10px;
-  margin: 8px 0;
-}
-
-.row { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
-
-input, textarea, button {
-  font: inherit;
-}
-
 input, textarea {
   width: 100%;
-  border: 1px solid #cad4e0;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-primary);
   border-radius: 8px;
   padding: 10px;
 }

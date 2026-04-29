@@ -10,6 +10,7 @@ import ReelsPage     from './pages/ReelsPage';
 import MessagesPage  from './pages/MessagesPage';
 import DashboardPage from './pages/DashboardPage';
 import SettingsPage  from './pages/SettingsPage';
+import StoriesArchivePage from './pages/StoriesArchivePage';
 import useAuth       from './hooks/useAuth';
 import MainLayout    from './components/MainLayout';
 
@@ -32,6 +33,7 @@ export default function App() {
       <Route path="/reels"           element={<PrivateRoute><ReelsPage /></PrivateRoute>} />
       <Route path="/messages"        element={<PrivateRoute><MessagesPage /></PrivateRoute>} />
       <Route path="/profile/:userId" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+      <Route path="/archive"         element={<PrivateRoute><StoriesArchivePage /></PrivateRoute>} />
       <Route path="/create"          element={<PrivateRoute><CreatePage /></PrivateRoute>} />
       <Route path="/dashboard"       element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
       <Route path="/settings"        element={<PrivateRoute><SettingsPage /></PrivateRoute>} />

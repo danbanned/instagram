@@ -6,7 +6,8 @@ export default function Navbar({ user, onLogout }) {
     <nav className="top-navbar hide-mobile">
       <div className="nav-container">
         <Link to="/" className="nav-logo">
-          <span>Instagram</span>
+          <span className="logo-icon">🎨</span>
+          <span className="logo-text">AI Instagram</span>
         </Link>
 
         <div className="nav-search-container">

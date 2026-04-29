@@ -10,6 +10,15 @@
   padding: 30px 20px 100px;
 }
 
+.loading, .error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  font-size: 18px;
+  color: #8e8e8e;
+}
+
 .collectionsSection {
   padding: 20px 0 8px;
 }
@@ -123,14 +132,28 @@
   background: #fafafa;
 }
 
-.loading, .error {
+.aboutTabContent {
+  padding: 40px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.aboutItem {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: 16px;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #efefef;
+}
+
+.aboutItem span:first-child {
+  font-weight: 600;
   color: #8e8e8e;
 }
+
+.aboutItem span:last-child {
+  color: #262626;
+}
+
 
 @media (max-width: 720px) {
   .container {

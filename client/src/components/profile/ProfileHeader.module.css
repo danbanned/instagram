@@ -135,6 +135,116 @@
   text-decoration: none;
 }
 
+.followerContext {
+  margin: 12px 0;
+  font-size: 14px;
+  color: #262626;
+}
+
+.followersText strong {
+  font-weight: 600;
+}
+
+.emailRow {
+  margin: 8px 0;
+}
+
+.emailLink {
+  color: #00376b;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.actionButtonsRow {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.followingDropdownBtn, .messageBtn, .emailDropdownBtn {
+  padding: 7px 16px;
+  background: #efefef;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.followingDropdownBtn {
+  background: #0095f6;
+  color: white;
+}
+
+.actionChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.contactContainer {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contactLink {
+  color: #00376b;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contactLink:hover {
+  text-decoration: underline;
+}
+
+.contactText {
+  color: #262626;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.actionChip {
+  padding: 8px 16px;
+  background: #e0e0e0;
+  border: 1px solid #dbdbdb;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionChip:hover {
+  background: #d0d0d0;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .actionChip {
+  background: #3a3a3a;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .actionChip:hover {
+  background: #4a4a4a;
+}
+
 .mobileActions {
   display: none;
 }

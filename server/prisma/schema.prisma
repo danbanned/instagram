@@ -46,12 +46,14 @@ model Profile {
   bio                String?
   website            String?
   phoneNumber        String?  @map("phone_number")
+  email              String?  // Display email in bio
   gender             String?
   isPrivate          Boolean  @default(false) @map("is_private")
   showActivityStatus Boolean  @default(true) @map("show_activity_status")
   isBusiness         Boolean  @default(false) @map("is_business")
   category           String?
   links              Json?
+  actionButtons      Json?    // Custom action buttons (results, podcast, etc.)
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 

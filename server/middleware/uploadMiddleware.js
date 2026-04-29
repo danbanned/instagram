@@ -1,32 +1,64 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+require('dotenv').config();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let uploadPath = path.join(__dirname, '..', 'uploads');
-    
-    // Check if we should use a subfolder based on the fieldname or some other logic
-    if (file.fieldname === 'avatar') {
-      uploadPath = path.join(uploadPath, 'avatars');
-    } else if (file.fieldname === 'story') {
-      uploadPath = path.join(uploadPath, 'stories');
-    } else if (file.fieldname === 'post') {
-      uploadPath = path.join(uploadPath, 'posts');
-    }
-    
-    // Ensure directory exists
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    
-    cb(null, uploadPath);
-  },
-  filename: (_, file, cb) => {
-    cb(null, `${uuidv4()}${path.extname(file.originalname)}`);
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Create storage for different types
+const postStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'instagram/posts',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4'],
+    transformation: [{ width: 1080, crop: 'limit' }]
   }
 });
+
+const avatarStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'instagram/avatars',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif'],
+    transformation: [{ width: 300, height: 300, crop: 'fill' }]
+  }
+});
+
+const storyStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'instagram/stories',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4'],
+  }
+});
+
+// Dynamic storage based on field name
+const storage = (req, file, cb) => {
+  if (file.fieldname === 'avatar') {
+    return avatarStorage;
+  } else if (file.fieldname === 'story') {
+    return storyStorage;
+  } else {
+    return postStorage;
+  }
+};
+
+// Custom storage engine wrapper to handle dynamic selection
+const dynamicStorage = {
+  _handleFile: (req, file, cb) => {
+    const selectedStorage = storage(req, file, cb);
+    selectedStorage._handleFile(req, file, cb);
+  },
+  _removeFile: (req, file, cb) => {
+    const selectedStorage = storage(req, file, cb);
+    selectedStorage._removeFile(req, file, cb);
+  }
+};
 
 const fileFilter = (_, file, cb) => {
   if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
@@ -36,6 +68,10 @@ const fileFilter = (_, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 25 * 1024 * 1024 } });
+const upload = multer({ 
+  storage: dynamicStorage, 
+  fileFilter, 
+  limits: { fileSize: 25 * 1024 * 1024 } 
+});
 
 module.exports = upload;

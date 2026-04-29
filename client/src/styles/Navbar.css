@@ -1,8 +1,8 @@
 .top-navbar {
   position: sticky;
   top: 0;
-  background: white;
-  border-bottom: 1px solid #dbdbdb;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border-color);
   z-index: 50;
   width: 100%;
 }
@@ -18,10 +18,26 @@
 }
 
 .nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 24px;
   font-weight: 700;
-  color: #262626;
+  color: var(--text-primary);
   text-decoration: none;
+  white-space: nowrap;
+  min-width: fit-content;
+  padding-right: 16px;
+}
+
+.logo-text {
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .logo-text {
+    display: none;
+  }
 }
 
 .nav-search-container {
@@ -31,8 +47,9 @@
 
 .nav-search-input {
   width: 100%;
-  background: #efefef;
-  border: none;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 12px 8px 36px;
   font-size: 16px;
