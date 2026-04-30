@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { toPublicMediaPath } = require('../services/storageService');
 
 let prisma;
 
@@ -414,8 +415,7 @@ async function uploadAvatar(req, res) {
     const userId = req.user.id;
     
     // Build avatar URL based on your upload structure
-    // Your upload middleware saves to /uploads/avatars with UUID filename
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    const avatarUrl = toPublicMediaPath(req.file);
 
     // Update user's avatar
     const updatedUser = await prisma.user.update({

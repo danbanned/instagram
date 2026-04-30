@@ -1,64 +1,50 @@
 const multer = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const useCloudinary = process.env.CLOUDINARY_CLOUD_NAME && 
+                     process.env.CLOUDINARY_API_KEY && 
+                     process.env.CLOUDINARY_API_SECRET;
 
-// Create storage for different types
-const postStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'instagram/posts',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4'],
-    transformation: [{ width: 1080, crop: 'limit' }]
-  }
-});
+let storage;
 
-const avatarStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'instagram/avatars',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'gif'],
-    transformation: [{ width: 300, height: 300, crop: 'fill' }]
-  }
-});
+if (useCloudinary) {
+  // Configure Cloudinary
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
 
-const storyStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'instagram/stories',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4'],
-  }
-});
+  // Create storage for different types
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'instagram/posts',
+      allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4'],
+      transformation: [{ width: 1080, crop: 'limit' }]
+    }
+  });
+  console.log('Using Cloudinary for file storage');
+} else {
+  // Local storage fallback
+  const uploadsDir = path.join(__dirname, '../uploads');
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-// Dynamic storage based on field name
-const storage = (req, file, cb) => {
-  if (file.fieldname === 'avatar') {
-    return avatarStorage;
-  } else if (file.fieldname === 'story') {
-    return storyStorage;
-  } else {
-    return postStorage;
-  }
-};
-
-// Custom storage engine wrapper to handle dynamic selection
-const dynamicStorage = {
-  _handleFile: (req, file, cb) => {
-    const selectedStorage = storage(req, file, cb);
-    selectedStorage._handleFile(req, file, cb);
-  },
-  _removeFile: (req, file, cb) => {
-    const selectedStorage = storage(req, file, cb);
-    selectedStorage._removeFile(req, file, cb);
-  }
-};
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+  console.log('Cloudinary credentials missing. Falling back to local disk storage.');
+}
 
 const fileFilter = (_, file, cb) => {
   if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
@@ -69,7 +55,7 @@ const fileFilter = (_, file, cb) => {
 };
 
 const upload = multer({ 
-  storage: dynamicStorage, 
+  storage: storage, 
   fileFilter, 
   limits: { fileSize: 25 * 1024 * 1024 } 
 });

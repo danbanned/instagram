@@ -22,15 +22,15 @@ function transformPost(post, likedByMe = false, savedByMe = false) {
     commentsDisabled: !!post.commentsDisabled,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
-    likesCount: post._count.likes,
+    likesCount: post._count?.likes || 0,
     likedByMe,
     savedByMe,
-    comments: post.comments.map((c) => ({
+    comments: post.comments?.map((c) => ({
       id: c.id,
       text: c.text,
       createdAt: c.createdAt,
       user: { id: c.user.id, username: c.user.username, avatarUrl: c.user.avatarUrl },
-    })),
+    })) || [],
     author: {
       id: post.author.id,
       username: post.author.username,
@@ -40,6 +40,8 @@ function transformPost(post, likedByMe = false, savedByMe = false) {
 }
 
 async function create({ authorId, caption, mediaUrl, mediaType, location, altText, hideLikeCount, commentsDisabled }) {
+  const { _count, ...includeWithoutCount } = POST_INCLUDE;
+
   const post = await prisma.post.create({
     data: {
       authorId,
@@ -51,7 +53,7 @@ async function create({ authorId, caption, mediaUrl, mediaType, location, altTex
       hideLikeCount:    !!hideLikeCount,
       commentsDisabled: !!commentsDisabled,
     },
-    include: POST_INCLUDE,
+    include: includeWithoutCount,
   });
   return transformPost(post);
 }

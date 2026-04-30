@@ -108,8 +108,10 @@ export default function CreatePage() {
       formData.append('commentsDisabled', String(details.commentsDisabled));
       await api.post('/posts', formData);
       navigate('/');
-    } catch {
-      setError('Failed to create post. Please try again.');
+    } catch (err) {
+      console.error('Post creation error:', err);
+      const msg = err.response?.data?.message || err.response?.data?.error || 'Failed to create post. Please try again.';
+      setError(msg);
       setSubmitting(false);
     }
   };

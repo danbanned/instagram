@@ -6,23 +6,36 @@ const cache = require('../services/cacheService');
 const { toPublicMediaPath, getMediaType } = require('../services/storageService');
 
 async function createPost(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-  if (!req.file) return res.status(400).json({ message: 'Media file is required' });
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!req.file) return res.status(400).json({ message: 'Media file is required' });
 
-  const post = await Post.create({
-    authorId:         req.user.id,
-    caption:          req.body.caption          || '',
-    mediaUrl:         toPublicMediaPath(req.file),
-    mediaType:        getMediaType(req.file.mimetype),
-    location:         req.body.location         || null,
-    altText:          req.body.altText          || null,
-    hideLikeCount:    req.body.hideLikeCount    === 'true',
-    commentsDisabled: req.body.commentsDisabled === 'true',
-  });
+    console.log('Creating post for user:', req.user.id);
+    console.log('File received:', req.file.filename, req.file.mimetype);
 
-  cache.del(`feed:${req.user.id}`);
-  res.status(201).json(post);
+    const post = await Post.create({
+      authorId:         req.user.id,
+      caption:          req.body.caption          || '',
+      mediaUrl:         toPublicMediaPath(req.file),
+      mediaType:        getMediaType(req.file.mimetype),
+      location:         req.body.location         || null,
+      altText:          req.body.altText          || null,
+      hideLikeCount:    req.body.hideLikeCount    === 'true',
+      commentsDisabled: req.body.commentsDisabled === 'true',
+    });
+
+    console.log('Post created successfully:', post.id);
+
+    cache.del(`feed:${req.user.id}`);
+    res.status(201).json(post);
+  } catch (err) {
+    console.error('Error in createPost controller:', err);
+    res.status(500).json({ 
+      message: 'Internal server error during post creation', 
+      error: err.message 
+    });
+  }
 }
 
 async function getFeed(req, res) {
