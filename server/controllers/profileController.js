@@ -61,6 +61,11 @@ async function getProfile(req, res) {
     // Get highlights
     const highlights = await prisma.highlight.findMany({
       where: { userId },
+      include: {
+        stories: {
+          orderBy: { createdAt: 'asc' }
+        }
+      },
       orderBy: { createdAt: 'desc' }
     });
 
@@ -82,6 +87,24 @@ async function getProfile(req, res) {
       take: 50
     });
 
+    const relatedUserIds = [
+      ...followersList.map((entry) => entry.follower.id),
+      ...followingList.map((entry) => entry.following.id)
+    ];
+
+    let currentUserFollowingSet = new Set();
+    if (currentUserId && relatedUserIds.length) {
+      const currentUserFollowing = await prisma.follow.findMany({
+        where: {
+          followerId: currentUserId,
+          followingId: { in: relatedUserIds }
+        },
+        select: { followingId: true }
+      });
+
+      currentUserFollowingSet = new Set(currentUserFollowing.map((entry) => entry.followingId));
+    }
+
     // Format response
     const profileData = {
       userId: user.id,
@@ -95,6 +118,9 @@ async function getProfile(req, res) {
       actionButtons: user.profile?.actionButtons,
       isPrivate: user.profile?.isPrivate || false,
       isBusiness: user.profile?.isBusiness || false,
+      createdAt: user.createdAt,
+      location: user.profile?.category || 'United States',
+      previousUsernames: [],
       hasStory: !!activeStory,
       stats: {
         postsCount: user._count.posts,
@@ -105,14 +131,14 @@ async function getProfile(req, res) {
           username: f.follower.username,
           avatar: f.follower.avatarUrl,
           name: f.follower.profile?.name || f.follower.username,
-          isFollowing: false
+          isFollowing: currentUserFollowingSet.has(f.follower.id)
         })),
         following: followingList.map(f => ({
           id: f.following.id,
           username: f.following.username,
           avatar: f.following.avatarUrl,
           name: f.following.profile?.name || f.following.username,
-          isFollowing: true
+          isFollowing: currentUserFollowingSet.has(f.following.id)
         }))
       },
       isFollowing,
@@ -464,4 +490,3 @@ module.exports = {
   updateProfile,
   uploadAvatar
 };
-

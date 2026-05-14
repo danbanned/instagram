@@ -50,12 +50,12 @@ export default function FeedPage() {
 
   const { data: notificationsData } = useQuery({
     queryKey: ['notifications'],
-    queryFn: fetchNotifications,
+    queryFn: () => fetchNotifications(),
     enabled: !!user,
   });
 
   useEffect(() => {
-    if (notificationsData) setNotifications(notificationsData);
+    if (notificationsData?.notifications) setNotifications(notificationsData.notifications);
   }, [notificationsData]);
 
   useSocket(user?.id, (notif) => {

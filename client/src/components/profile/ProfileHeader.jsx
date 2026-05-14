@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SafeImage } from '../../utils/media';
+import FollowButton from '../FollowButton';
 import styles from './ProfileHeader.module.css';
 
 export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEditProfile, onOpenArchive }) {
@@ -37,7 +38,20 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
 
       <div className={styles.detailsColumn}>
         <div className={styles.usernameRow}>
-          <h1 className={styles.username}>{profile.username}</h1>
+          <h1
+            className={styles.usernameButton}
+            onClick={profile.onOpenAboutAccount}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                profile.onOpenAboutAccount?.();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <span className={styles.username}>{profile.username}</span>
+          </h1>
           {isOwnProfile ? (
             <>
               <button type="button" className={styles.inlineButton} onClick={onOpenEditProfile}>
@@ -57,9 +71,11 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
             </>
           ) : (
             <>
-              <button type="button" className={styles.followButton}>
-                {profile.isFollowing ? 'Following' : 'Follow'}
-              </button>
+              <FollowButton
+                userId={profile.userId}
+                initialIsFollowing={profile.isFollowing}
+                onFollowChange={profile.onFollowChange}
+              />
               <button type="button" className={styles.inlineButton}>
                 Message
               </button>
@@ -74,12 +90,12 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
           <span className={styles.stat}>
             <strong>{stats?.postsCount?.toLocaleString() || 0}</strong> posts
           </span>
-          <span className={styles.stat}>
+          <button type="button" className={styles.statButton} onClick={profile.onOpenFollowers}>
             <strong>{stats?.followersCount?.toLocaleString() || 0}</strong> followers
-          </span>
-          <span className={styles.stat}>
+          </button>
+          <button type="button" className={styles.statButton} onClick={profile.onOpenFollowing}>
             <strong>{stats?.followingCount?.toLocaleString() || 0}</strong> following
-          </span>
+          </button>
         </div>
 
         <div className={styles.followerContext}>
@@ -126,7 +142,13 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
         <div className={styles.actionButtonsRow}>
           {!isOwnProfile && (
             <>
-              <button className={styles.followingDropdownBtn}>Following ▼</button>
+              <FollowButton
+                userId={profile.userId}
+                initialIsFollowing={profile.isFollowing}
+                onFollowChange={profile.onFollowChange}
+                variant="chip"
+                className={styles.followChip}
+              />
               <button className={styles.messageBtn}>Message</button>
               <button className={styles.emailDropdownBtn}>Email ▼</button>
             </>

@@ -45,6 +45,10 @@
   cursor: pointer;
 }
 
+.nav-item .badge {
+  margin-left: auto;
+}
+
 .nav-item:hover {
   background: #fafafa;
 }

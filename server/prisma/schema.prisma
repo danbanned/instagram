@@ -68,6 +68,8 @@ model Post {
   mediaUrl         String   @map("media_url")
   mediaType        String   @default("image") @map("media_type") @db.VarChar(10)
   location         String?
+  locationId       String?  @map("location_id")
+  mentions         String[] @default([])
   isPinned         Boolean  @default(false) @map("is_pinned")
   isAIGenerated    Boolean  @default(false) @map("is_ai_generated")
   altText          String?  @map("alt_text")
@@ -89,8 +91,11 @@ model Post {
   analytics     PostAnalytics?
   reposts       Repost[]
   tags          PostTag[]
+  hashtags      PostHashtag[]
+  locationRef   Location?      @relation(fields: [locationId], references: [id], onDelete: SetNull)
 
   @@index([authorId])
+  @@index([locationId])
   @@map("posts")
 }
 
@@ -259,6 +264,44 @@ model Highlight {
 
   @@index([userId])
   @@map("highlights")
+}
+
+model Hashtag {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  posts     PostHashtag[]
+
+  @@map("hashtags")
+}
+
+model PostHashtag {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id") @db.Uuid
+  hashtagId String   @map("hashtag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  hashtag Hashtag @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, hashtagId])
+  @@index([hashtagId])
+  @@map("post_hashtags")
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  name      String
+  country   String?
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  posts     Post[]
+
+  @@unique([name, country])
+  @@map("locations")
 }
 
 

@@ -1,4 +1,4 @@
- {
+{
   "name": "instagram-clone-monorepo",
   "private": true,
   "version": "1.0.0",
@@ -6,6 +6,12 @@
     "dev:client": "npm --prefix client run dev",
     "dev:server": "npm --prefix server run dev",
     "build:client": "npm --prefix client run build",
-    "start:server": "npm --prefix server run start"
+    "start:server": "npm --prefix server run start",
+    "seed": "npm --prefix server run seed",
+    "seed:reset": "npm --prefix server run seed:reset",
+    "db:reset": "npm --prefix server run db:reset"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3"
   }
 }

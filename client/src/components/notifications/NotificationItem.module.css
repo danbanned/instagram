@@ -1,0 +1,69 @@
+.notificationItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid #efefef;
+  position: relative;
+}
+
+.notificationItem.unread {
+  background: #f0f7ff;
+  margin: 0 -12px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.icon {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 11px;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.text {
+  color: #262626;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.time {
+  margin-top: 4px;
+  color: #8e8e8e;
+  font-size: 12px;
+}
+
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: #0095f6;
+  flex-shrink: 0;
+}

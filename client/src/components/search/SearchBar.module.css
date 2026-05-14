@@ -1,0 +1,35 @@
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 0 14px;
+  min-height: 46px;
+}
+
+.icon {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  height: 44px;
+  font-size: 15px;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.clearButton {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  padding: 0;
+}

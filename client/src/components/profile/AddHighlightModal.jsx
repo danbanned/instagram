@@ -17,7 +17,7 @@ export default function AddHighlightModal({ isOpen, onClose, onSave, editingHigh
       loadStories();
       if (editingHighlight) {
         setName(editingHighlight.name);
-        setSelectedStoryIds(editingHighlight.stories.map(s => s.id));
+        setSelectedStoryIds((editingHighlight.stories || []).map((story) => story.id));
         setStep(2);
       } else {
         setName('');

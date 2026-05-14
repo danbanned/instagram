@@ -1,0 +1,42 @@
+.section {
+  padding: 18px 20px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.mobile {
+  padding-top: 10px;
+  border-top: none;
+}
+
+.header {
+  margin-bottom: 12px;
+}
+
+.header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.active {
+  background: #262626;
+  border-color: #262626;
+  color: #fff;
+}

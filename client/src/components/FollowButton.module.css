@@ -1,0 +1,49 @@
+.followButton {
+  min-height: 32px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid #0095f6;
+  background: #0095f6;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.followButton:hover {
+  background: #0077cc;
+  border-color: #0077cc;
+}
+
+.followButton.following {
+  background: #efefef;
+  border-color: #dbdbdb;
+  color: #262626;
+}
+
+.followButton.following:hover {
+  background: #dbdbdb;
+}
+
+.chipButton {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid #0095f6;
+  background: #0095f6;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chipButton.following {
+  background: #efefef;
+  border-color: #dbdbdb;
+  color: #262626;
+}
+
+.chipButton:disabled,
+.followButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

@@ -175,11 +175,34 @@
   margin-top: 4px;
 }
 
+.ig-post__mentions,
+.ig-post__hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ig-post__mentions {
+  margin-top: 6px;
+}
+
+.ig-post__mention,
 .ig-post__hashtag {
   color: #0095f6;
   text-decoration: none;
-  margin-right: 6px;
   font-size: 13px;
+  font-weight: 600;
+}
+
+.ig-post__caption-location {
+  margin-top: 6px;
+}
+
+.ig-post__caption-location-link {
+  color: #262626;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* Comments */

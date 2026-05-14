@@ -8,6 +8,8 @@ import PostGrid from '../components/profile/PostGrid';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import PostDetailModal from '../components/profile/PostDetailModal';
 import HighlightViewer from '../components/profile/HighlightViewer';
+import FollowListModal from '../components/profile/FollowListModal';
+import AboutAccountModal from '../components/profile/AboutAccountModal';
 import styles from './NewProfilePage.module.css';
 
 export default function NewProfilePage() {
@@ -22,6 +24,9 @@ export default function NewProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState(null);
   const [showHighlightViewer, setShowHighlightViewer] = useState(false);
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [showAboutAccountModal, setShowAboutAccountModal] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -158,12 +163,46 @@ export default function NewProfilePage() {
   ];
 
   const handleHighlightClick = (highlight) => {
+    if (!highlight?.stories?.length) return;
     setSelectedHighlight(highlight);
     setShowHighlightViewer(true);
   };
 
   const handleUpdateHighlights = async () => {
     await fetchProfile();
+  };
+
+  const handleProfileFollowChange = (isFollowing) => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        isFollowing,
+        stats: {
+          ...prev.stats,
+          followersCount: Math.max(0, (prev.stats?.followersCount || 0) + (isFollowing ? 1 : -1))
+        }
+      };
+    });
+  };
+
+  const updateStatUsers = (key, updater) => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+
+      const currentUsers = prev.stats?.[key] || [];
+      const nextUsers = typeof updater === 'function' ? updater(currentUsers) : updater;
+
+      return {
+        ...prev,
+        stats: {
+          ...prev.stats,
+          [key]: nextUsers,
+          followersCount: key === 'followers' ? nextUsers.length : prev.stats.followersCount,
+          followingCount: key === 'following' ? nextUsers.length : prev.stats.followingCount
+        }
+      };
+    });
   };
 
   if (loading) return <div className={styles.loading}>Loading profile...</div>;
@@ -173,7 +212,13 @@ export default function NewProfilePage() {
     <div className={styles.profilePage}>
       <div className={styles.container}>
         <ProfileHeader 
-          profile={profile} 
+          profile={{
+            ...profile,
+            onOpenFollowers: () => setShowFollowersModal(true),
+            onOpenFollowing: () => setShowFollowingModal(true),
+            onOpenAboutAccount: () => setShowAboutAccountModal(true),
+            onFollowChange: handleProfileFollowChange
+          }}
           stats={profile.stats}
           isOwnProfile={isOwnProfile}
           onOpenEditProfile={() => setShowEditModal(true)}
@@ -249,7 +294,37 @@ export default function NewProfilePage() {
       {showHighlightViewer && selectedHighlight && (
         <HighlightViewer
           highlight={selectedHighlight}
-          onClose={() => setShowHighlightViewer(false)}
+          onClose={() => {
+            setShowHighlightViewer(false);
+            setSelectedHighlight(null);
+          }}
+        />
+      )}
+
+      {showFollowersModal && (
+        <FollowListModal
+          type="followers"
+          profileUserId={profile.userId}
+          users={profile.stats?.followers || []}
+          onUsersChange={(updater) => updateStatUsers('followers', updater)}
+          onClose={() => setShowFollowersModal(false)}
+        />
+      )}
+
+      {showFollowingModal && (
+        <FollowListModal
+          type="following"
+          profileUserId={profile.userId}
+          users={profile.stats?.following || []}
+          onUsersChange={(updater) => updateStatUsers('following', updater)}
+          onClose={() => setShowFollowingModal(false)}
+        />
+      )}
+
+      {showAboutAccountModal && (
+        <AboutAccountModal
+          profile={profile}
+          onClose={() => setShowAboutAccountModal(false)}
         />
       )}
     </div>

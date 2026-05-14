@@ -1,0 +1,114 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.modal {
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(80vh, 680px);
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modalHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.closeButton {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #262626;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.profileSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #efefef;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  color: #262626;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.name {
+  color: #8e8e8e;
+  font-size: 14px;
+}
+
+.section {
+  padding: 20px 0;
+}
+
+.section h3 {
+  margin: 0 0 16px;
+  color: #262626;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #efefef;
+}
+
+.label {
+  color: #8e8e8e;
+  font-size: 14px;
+}
+
+.value {
+  color: #262626;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.helpText {
+  color: #8e8e8e;
+  font-size: 14px;
+  line-height: 1.5;
+}

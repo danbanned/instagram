@@ -16,7 +16,11 @@ export default function LoginPage() {
       await login({ email, password });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const apiError =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.[0]?.msg ||
+        (err.request ? 'Unable to reach the server' : null);
+      setError(apiError || 'Login failed');
     }
   };
 

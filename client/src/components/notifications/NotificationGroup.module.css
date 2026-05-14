@@ -1,0 +1,15 @@
+.group {
+  margin-bottom: 20px;
+}
+
+.groupTitle {
+  margin: 0 0 10px;
+  color: #262626;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.notifications {
+  display: flex;
+  flex-direction: column;
+}

@@ -17,7 +17,11 @@ export default function RegisterPage() {
       await register(form);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const apiError =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.[0]?.msg ||
+        (err.request ? 'Unable to reach the server' : null);
+      setError(apiError || 'Registration failed');
     }
   };
 

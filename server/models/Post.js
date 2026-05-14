@@ -2,11 +2,30 @@ const prisma = require('../config/prisma');
 
 const POST_INCLUDE = {
   author: { select: { id: true, username: true, avatarUrl: true } },
+  hashtags: {
+    include: {
+      hashtag: { select: { id: true, name: true } }
+    }
+  },
+  tags: {
+    include: {
+      user: { select: { id: true, username: true, avatarUrl: true } }
+    }
+  },
+  locationRef: {
+    select: {
+      id: true,
+      name: true,
+      country: true,
+      latitude: true,
+      longitude: true
+    }
+  },
   comments: {
     include: { user: { select: { id: true, username: true, avatarUrl: true } } },
     orderBy: { createdAt: 'asc' },
   },
-  _count: { select: { likes: true } },
+  _count: { select: { likes: true, comments: true } },
 };
 
 function transformPost(post, likedByMe = false, savedByMe = false) {
@@ -20,9 +39,18 @@ function transformPost(post, likedByMe = false, savedByMe = false) {
     isAIGenerated: post.isAIGenerated || false,
     hideLikeCount: !!post.hideLikeCount,
     commentsDisabled: !!post.commentsDisabled,
+    mentions: post.mentions || [],
+    hashtags: (post.hashtags || []).map((entry) => entry.hashtag.name),
+    taggedUsers: (post.tags || []).map((tag) => ({
+      id: tag.user.id,
+      username: tag.user.username,
+      avatarUrl: tag.user.avatarUrl
+    })),
+    locationRecord: post.locationRef || null,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
     likesCount: post._count?.likes || 0,
+    commentsCount: post._count?.comments || 0,
     likedByMe,
     savedByMe,
     comments: post.comments?.map((c) => ({
@@ -49,6 +77,7 @@ async function create({ authorId, caption, mediaUrl, mediaType, location, altTex
       mediaUrl,
       mediaType,
       location:         location         || null,
+      mentions:         [],
       altText:          altText          || null,
       hideLikeCount:    !!hideLikeCount,
       commentsDisabled: !!commentsDisabled,

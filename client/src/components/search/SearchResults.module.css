@@ -1,0 +1,162 @@
+.results {
+  min-width: 0;
+}
+
+.tabs {
+  position: sticky;
+  top: 60px;
+  z-index: 5;
+  display: flex;
+  gap: 20px;
+  padding: 0 0 16px;
+  margin-bottom: 20px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0 0 10px;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.activeTab {
+  color: var(--text-primary);
+  box-shadow: inset 0 -2px 0 #262626;
+}
+
+.block {
+  margin-bottom: 28px;
+}
+
+.blockHeader {
+  margin-bottom: 14px;
+}
+
+.blockHeader h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.list {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 0 18px;
+}
+
+.postGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.postCard {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+}
+
+.postImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.postOverlay {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.postCard:hover .postOverlay {
+  opacity: 1;
+}
+
+.audioList {
+  display: grid;
+  gap: 12px;
+}
+
+.audioCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 14px 16px;
+}
+
+.audioAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.audioMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.audioMeta strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.audioMeta span {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.audioCount {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.notice {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.sentinel {
+  height: 1px;
+}
+
+@media (max-width: 768px) {
+  .results {
+    padding: 0 16px;
+  }
+
+  .postGrid {
+    gap: 4px;
+    border-radius: 0;
+  }
+
+  .list {
+    border-radius: 18px;
+  }
+}

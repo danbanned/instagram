@@ -1,0 +1,69 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.username,
+.name,
+.bio {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.username {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.name {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.bio {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.actionButton {
+  min-width: 92px;
+  background: #0095f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.following {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}

@@ -16,6 +16,10 @@ const storyRoutes = require('./routes/storyRoutes');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const highlightRoutes = require('./routes/highlightRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+const savedRoutes = require('./routes/savedRoutes');
+const hashtagRoutes = require('./routes/hashtagRoutes');
+const locationRoutes = require('./routes/locationRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -74,6 +78,10 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/highlights', highlightRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/saved', savedRoutes);
+app.use('/api/hashtags', hashtagRoutes);
+app.use('/api/locations', locationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

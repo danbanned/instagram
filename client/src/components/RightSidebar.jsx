@@ -1,14 +1,25 @@
 import './RightSidebar.css';
 import { SafeImage } from '../utils/media';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import api from '../services/api';
+import FollowButton from './FollowButton';
 
 export default function RightSidebar({ user }) {
-  const suggestions = [
-    { id: 1, username: 'ronald', fullName: 'Ronald McDonald', followedBy: 'd4nn3yfevl0n3' },
-    { id: 2, username: 'laldydaldy', fullName: 'Laldy Daldy', followedBy: 'nahhumane' },
-    { id: 3, username: 'nahhumane', fullName: 'Human Nah', followedBy: 'ronald' },
-    { id: 4, username: 'cristiano', fullName: 'Cristiano Ronaldo', followedBy: 'laldydaldy' },
-    { id: 5, username: 'leomessi', fullName: 'Lionel Messi', followedBy: 'nahhumane' },
-  ];
+  const [suggestions, setSuggestions] = useState([]);
+
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      try {
+        const response = await api.get('/search?limit=5');
+        setSuggestions(response.data.users || []);
+      } catch (error) {
+        console.error('Failed to load suggestions:', error);
+      }
+    };
+
+    loadSuggestions();
+  }, []);
 
   return (
     <aside className="right-sidebar">
@@ -34,16 +45,25 @@ export default function RightSidebar({ user }) {
         <div className="suggestions-list">
           {suggestions.map((suggested) => (
             <div key={suggested.id} className="suggestion-item">
-              <div className="suggested-user-info">
+              <Link to={`/profile/${suggested.id}`} className="suggested-user-info">
                 <div className="avatar-container small">
-                  <div className="placeholder-avatar">👤</div>
+                  <SafeImage src={suggested.avatar || '/default-avatar.png'} alt={suggested.username} className="user-avatar" />
                 </div>
                 <div className="suggested-details">
                   <span className="suggested-username">{suggested.username}</span>
-                  <span className="followed-by">Followed by {suggested.followedBy}</span>
+                  <span className="followed-by">{suggested.name || suggested.username}</span>
                 </div>
-              </div>
-              <button className="follow-link">Follow</button>
+              </Link>
+              <FollowButton
+                userId={suggested.id}
+                initialIsFollowing={suggested.isFollowing}
+                variant="chip"
+                onFollowChange={(isFollowing) => {
+                  setSuggestions((prev) => prev.map((entry) => (
+                    entry.id === suggested.id ? { ...entry, isFollowing } : entry
+                  )));
+                }}
+              />
             </div>
           ))}
         </div>

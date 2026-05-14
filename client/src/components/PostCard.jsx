@@ -13,9 +13,14 @@ function extractHashtags(caption) {
   return (caption.match(/#\w+/g) || []).map((t) => t.slice(1));
 }
 
+function extractMentions(caption) {
+  if (!caption) return [];
+  return (caption.match(/@\w[\w.]*/g) || []).map((t) => t.slice(1));
+}
+
 function stripHashtags(caption) {
   if (!caption) return '';
-  return caption.replace(/#\w+/g, '').trim();
+  return caption.replace(/#\w+/g, '').replace(/@\w[\w.]*/g, '').trim();
 }
 
 export default function PostCard({ post, currentUser, onLike, onComment, onSave, onFollow }) {
@@ -29,7 +34,10 @@ export default function PostCard({ post, currentUser, onLike, onComment, onSave,
   const navigate = useNavigate();
 
   const isOwnPost = String(post.author.id) === String(currentUser?.id);
-  const hashtags = extractHashtags(post.caption);
+  const hashtags = post.hashtags?.length ? post.hashtags : extractHashtags(post.caption);
+  const taggedUsers = post.taggedUsers?.length
+    ? post.taggedUsers
+    : extractMentions(post.caption).map((username) => ({ id: null, username }));
   const captionText = stripHashtags(post.caption);
 
   const handleLikeClick = () => onLike && onLike(post.id, post.likedByMe);
@@ -180,19 +188,41 @@ export default function PostCard({ post, currentUser, onLike, onComment, onSave,
       </div>
 
       {/* Caption */}
-      {(captionText || hashtags.length > 0) && (
+      {(captionText || hashtags.length > 0 || taggedUsers.length > 0 || post.location) && (
         <div className="ig-post__caption">
           <Link to={`/profile/${post.author.id}`} className="ig-post__caption-user">
             {post.author.username}
           </Link>
           {captionText && <span>{captionText}</span>}
+          {taggedUsers.length > 0 && (
+            <div className="ig-post__mentions">
+              {taggedUsers.map((mention) => (
+                mention.id ? (
+                  <Link key={mention.id} to={`/profile/${mention.id}`} className="ig-post__mention">
+                    @{mention.username}
+                  </Link>
+                ) : (
+                  <Link key={mention.username} to={`/search?q=${encodeURIComponent(`@${mention.username}`)}`} className="ig-post__mention">
+                    @{mention.username}
+                  </Link>
+                )
+              ))}
+            </div>
+          )}
           {hashtags.length > 0 && (
             <div className="ig-post__hashtags">
               {hashtags.map((tag) => (
-                <Link key={tag} to={`/explore/tags/${tag}`} className="ig-post__hashtag">
+                <Link key={tag} to={`/hashtag/${tag}`} className="ig-post__hashtag">
                   #{tag}
                 </Link>
               ))}
+            </div>
+          )}
+          {post.location && (
+            <div className="ig-post__caption-location">
+              <Link to={`/search?q=${encodeURIComponent(post.location)}`} className="ig-post__caption-location-link">
+                📍 {post.location}
+              </Link>
             </div>
           )}
         </div>

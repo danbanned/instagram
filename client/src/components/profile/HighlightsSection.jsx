@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { SafeImage } from '../../utils/media';
-import AddHighlightModal from './AddHighlightModal';
+import HighlightEditModal from './HighlightEditModal';
 import { deleteHighlight } from '../../services/highlightService';
 import styles from './HighlightsSection.module.css';
 
@@ -72,7 +72,7 @@ export default function HighlightsSection({ highlights = [], isOwnProfile, onUpd
         )}
       </div>
 
-      <AddHighlightModal 
+      <HighlightEditModal
         isOpen={showAddModal}
         onClose={() => {
           setShowAddModal(false);

@@ -2,6 +2,7 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 const { validationResult } = require('express-validator');
 const { createNotification } = require('../services/notificationService');
+const { syncPostMetadata } = require('../services/postMetadataService');
 const cache = require('../services/cacheService');
 const { toPublicMediaPath, getMediaType } = require('../services/storageService');
 
@@ -25,10 +26,31 @@ async function createPost(req, res) {
       commentsDisabled: req.body.commentsDisabled === 'true',
     });
 
+    const metadata = await syncPostMetadata({
+      postId: post.id,
+      authorId: req.user.id,
+      caption: req.body.caption || '',
+      location: req.body.location || null
+    });
+
+    await Promise.all(
+      metadata.mentionedUsers.map((mentionedUser) =>
+        createNotification({
+          recipientId: mentionedUser.id,
+          senderId: req.user.id,
+          type: 'mention',
+          postId: post.id,
+          message: `${req.user.username} mentioned you in a post`
+        }).catch(() => {})
+      )
+    );
+
+    const hydratedPost = await Post.findById(post.id);
+
     console.log('Post created successfully:', post.id);
 
     cache.del(`feed:${req.user.id}`);
-    res.status(201).json(post);
+    res.status(201).json(hydratedPost);
   } catch (err) {
     console.error('Error in createPost controller:', err);
     res.status(500).json({ 
@@ -222,10 +244,22 @@ async function updatePostSettings(req, res) {
     if (typeof req.body.caption === 'string') updates.caption = req.body.caption;
     if (typeof req.body.hideLikeCount === 'boolean') updates.hideLikeCount = req.body.hideLikeCount;
     if (typeof req.body.commentsDisabled === 'boolean') updates.commentsDisabled = req.body.commentsDisabled;
+    if (typeof req.body.location === 'string') updates.location = req.body.location;
 
     const updated = await Post.updateById(req.params.postId, req.user.id, updates);
+
+    if (typeof req.body.caption === 'string' || typeof req.body.location === 'string') {
+      await syncPostMetadata({
+        postId: updated.id,
+        authorId: req.user.id,
+        caption: typeof req.body.caption === 'string' ? req.body.caption : updated.caption,
+        location: typeof req.body.location === 'string' ? req.body.location : updated.location
+      });
+    }
+
+    const hydratedPost = await Post.findById(req.params.postId);
     cache.del(`feed:${req.user.id}`);
-    res.json({ success: true, post: updated });
+    res.json({ success: true, post: hydratedPost });
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message });
   }

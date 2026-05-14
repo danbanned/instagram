@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import CreateDropdown from './CreateDropdown';
 import StoryCreator   from './StoryCreator';
 import MoreMenu       from './MoreMenu';
+import NotificationBadge from './notifications/NotificationBadge';
 import './LeftSidebar.css';
 
 const NAV_ITEMS = [
@@ -55,6 +56,7 @@ export default function LeftSidebar({ user }) {
             >
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>
+              {item.path === '/notifications' && <NotificationBadge />}
             </Link>
           ))}
 

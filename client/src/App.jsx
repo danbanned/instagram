@@ -11,6 +11,8 @@ import MessagesPage  from './pages/MessagesPage';
 import DashboardPage from './pages/DashboardPage';
 import SettingsPage  from './pages/SettingsPage';
 import StoriesArchivePage from './pages/StoriesArchivePage';
+import HashtagPage from './pages/HashtagPage';
+import NotificationsPage from './pages/NotificationsPage';
 import useAuth       from './hooks/useAuth';
 import MainLayout    from './components/MainLayout';
 
@@ -32,6 +34,8 @@ export default function App() {
       <Route path="/explore"         element={<PrivateRoute><ExplorePage /></PrivateRoute>} />
       <Route path="/reels"           element={<PrivateRoute><ReelsPage /></PrivateRoute>} />
       <Route path="/messages"        element={<PrivateRoute><MessagesPage /></PrivateRoute>} />
+      <Route path="/notifications"   element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
+      <Route path="/hashtag/:tag"    element={<PrivateRoute><HashtagPage /></PrivateRoute>} />
       <Route path="/profile/:userId" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
       <Route path="/archive"         element={<PrivateRoute><StoriesArchivePage /></PrivateRoute>} />
       <Route path="/create"          element={<PrivateRoute><CreatePage /></PrivateRoute>} />

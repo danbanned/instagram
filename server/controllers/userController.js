@@ -71,4 +71,64 @@ async function getMyFollowing(req, res) {
   }
 }
 
-module.exports = { getUserProfile, getUserPosts, searchUsers, getMyFollowing };
+async function getSuggestions(req, res) {
+  try {
+    const userId = req.user.id;
+
+    const users = await prisma.user.findMany({
+      where: {
+        id: { not: userId },
+        followers: {
+          none: { followerId: userId }
+        }
+      },
+      include: {
+        profile: { select: { name: true } },
+        followers: {
+          take: 2,
+          include: {
+            follower: { select: { username: true } }
+          }
+        }
+      },
+      take: 10,
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({
+      success: true,
+      users: users.map((user) => ({
+        id: user.id,
+        username: user.username,
+        avatar: user.avatarUrl,
+        fullName: user.profile?.name || user.username,
+        followedBy: user.followers[0]?.follower?.username || null,
+        suggested: true,
+        isFollowing: false
+      }))
+    });
+  } catch (err) {
+    console.error('Suggestions error:', err);
+    res.status(500).json({ error: 'Failed to get suggestions' });
+  }
+}
+
+async function removeFollower(req, res) {
+  try {
+    const { followerId } = req.params;
+
+    await prisma.follow.deleteMany({
+      where: {
+        followerId,
+        followingId: req.user.id
+      }
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Remove follower error:', err);
+    res.status(500).json({ error: 'Failed to remove follower' });
+  }
+}
+
+module.exports = { getUserProfile, getUserPosts, searchUsers, getMyFollowing, getSuggestions, removeFollower };

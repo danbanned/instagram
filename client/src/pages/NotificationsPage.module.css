@@ -1,0 +1,101 @@
+.notificationsContainer {
+  grid-column: 2 / span 2;
+  width: 100%;
+  padding: 24px 20px 60px;
+}
+
+.panel {
+  width: min(420px, 100%);
+  margin-left: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  position: sticky;
+  top: 84px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.markAllRead {
+  border: none;
+  background: transparent;
+  color: #0095f6;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0;
+}
+
+.infoBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 18px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.infoBox span {
+  font-size: 22px;
+}
+
+.infoBox strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.infoBox p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.notificationsList {
+  min-height: 120px;
+}
+
+.loading,
+.empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1000px) {
+  .notificationsContainer {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .notificationsContainer {
+    grid-column: auto;
+    padding: 16px 12px 40px;
+  }
+
+  .panel {
+    width: 100%;
+    margin: 0 auto;
+    position: static;
+    padding: 16px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
