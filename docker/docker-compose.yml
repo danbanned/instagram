@@ -1,13 +1,26 @@
 version: '3.9'
 services:
-  mongo:
-    image: mongo:7
-    container_name: ig-mongo
+  postgres:
+    image: postgres:15
+    container_name: ig-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: instagram
+      POSTGRES_PASSWORD: instagram123
+      POSTGRES_DB: instagram_dms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: ig-redis
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "6379:6379"
     volumes:
-      - mongo_data:/data/db
+      - redis_data:/data
 
   server:
     build:
@@ -18,7 +31,8 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - mongo
+      - postgres
+      - redis
     volumes:
       - ../server:/app
       - /app/node_modules
@@ -38,4 +52,5 @@ services:
       - /app/node_modules
 
 volumes:
-  mongo_data:
+  postgres_data:
+  redis_data:

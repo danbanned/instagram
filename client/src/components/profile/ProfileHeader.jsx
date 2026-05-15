@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SafeImage } from '../../utils/media';
+import api from '../../services/api';
 import FollowButton from '../FollowButton';
 import styles from './ProfileHeader.module.css';
 
@@ -22,6 +23,24 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
     if (action === 'report') alert('Report user');
     if (action === 'block') alert('Block user');
     setShowMenu(false);
+  };
+
+  const handleMessageClick = async () => {
+    try {
+      const response = await api.post('/messages/conversations', { otherUserId: profile.userId });
+      if (response.data.conversationId) {
+        navigate(`/messages/${response.data.conversationId}`);
+      }
+    } catch (error) {
+      console.error('Failed to start conversation:', error);
+      alert('Failed to start conversation');
+    }
+  };
+
+  const handleEmailClick = () => {
+    if (profile.email) {
+      window.location.href = `mailto:${profile.email}`;
+    }
   };
 
   return (
@@ -76,7 +95,12 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
                 initialIsFollowing={profile.isFollowing}
                 onFollowChange={profile.onFollowChange}
               />
-              <button type="button" className={styles.inlineButton}>
+              <button 
+                type="button" 
+                className={styles.inlineButton}
+                onClick={handleMessageClick}
+                style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}
+              >
                 Message
               </button>
               <button type="button" className={styles.iconButton} onClick={() => setShowMenu(true)}>
@@ -149,8 +173,22 @@ export default function ProfileHeader({ profile, stats, isOwnProfile, onOpenEdit
                 variant="chip"
                 className={styles.followChip}
               />
-              <button className={styles.messageBtn}>Message</button>
-              <button className={styles.emailDropdownBtn}>Email ▼</button>
+              <button 
+                className={styles.messageBtn}
+                onClick={handleMessageClick}
+                style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}
+              >
+                Message
+              </button>
+              {profile.email && (
+                <button 
+                  className={styles.emailDropdownBtn}
+                  onClick={handleEmailClick}
+                  style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}
+                >
+                  Email ▼
+                </button>
+              )}
             </>
           )}
         </div>

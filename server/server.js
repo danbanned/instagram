@@ -20,6 +20,7 @@ const searchRoutes = require('./routes/searchRoutes');
 const savedRoutes = require('./routes/savedRoutes');
 const hashtagRoutes = require('./routes/hashtagRoutes');
 const locationRoutes = require('./routes/locationRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -82,6 +83,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/saved', savedRoutes);
 app.use('/api/hashtags', hashtagRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

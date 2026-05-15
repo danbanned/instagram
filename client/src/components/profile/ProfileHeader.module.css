@@ -191,12 +191,18 @@
 .messageBtn,
 .emailDropdownBtn {
   padding: 7px 16px;
-  background: #efefef;
+  background: #000;
+  color: #fff;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
+}
+
+.messageBtn:hover,
+.emailDropdownBtn:hover {
+  background: #333;
 }
 
 .actionChips {

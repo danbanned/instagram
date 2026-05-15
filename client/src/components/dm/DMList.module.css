@@ -1,0 +1,66 @@
+.dmList {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.title {
+  padding: 20px;
+  font-size: 20px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.conversations {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.conversationLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.conversationItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.conversationItem:hover {
+  background-color: #fafafa;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: 14px;
+}
+
+.lastMessage {
+  font-size: 14px;
+  color: #737373;
+  margin-top: 4px;
+}
+
+.unreadBadge {
+  background-color: #0095f6;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}

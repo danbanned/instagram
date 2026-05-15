@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { login as loginRequest, me, register as registerRequest } from '../services/authService';
+import { initSocket, disconnectSocket } from '../services/socket';
 
 const AuthContext = createContext(null);
 
@@ -14,7 +15,10 @@ export function AuthProvider({ children }) {
       return;
     }
     me()
-      .then((data) => setUser(data.user))
+      .then((data) => {
+        setUser(data.user);
+        initSocket(token);
+      })
       .catch(() => {
         localStorage.removeItem('token');
         setUser(null);
@@ -26,17 +30,20 @@ export function AuthProvider({ children }) {
     const data = await loginRequest(payload);
     localStorage.setItem('token', data.token);
     setUser(data.user);
+    initSocket(data.token);
   };
 
   const register = async (payload) => {
     const data = await registerRequest(payload);
     localStorage.setItem('token', data.token);
     setUser(data.user);
+    initSocket(data.token);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    disconnectSocket();
   };
 
   const value = useMemo(() => ({ user, loading, login, register, logout }), [user, loading]);

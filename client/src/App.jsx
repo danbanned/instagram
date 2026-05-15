@@ -34,6 +34,7 @@ export default function App() {
       <Route path="/explore"         element={<PrivateRoute><ExplorePage /></PrivateRoute>} />
       <Route path="/reels"           element={<PrivateRoute><ReelsPage /></PrivateRoute>} />
       <Route path="/messages"        element={<PrivateRoute><MessagesPage /></PrivateRoute>} />
+      <Route path="/messages/:conversationId" element={<PrivateRoute><MessagesPage /></PrivateRoute>} />
       <Route path="/notifications"   element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
       <Route path="/hashtag/:tag"    element={<PrivateRoute><HashtagPage /></PrivateRoute>} />
       <Route path="/profile/:userId" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
