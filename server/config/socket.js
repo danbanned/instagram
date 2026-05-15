@@ -31,6 +31,7 @@ function initSocket(server) {
 
   io.on('connection', (socket) => {
     const userId = socket.userId;
+    console.log(`User connected to socket: ${userId}`);
     connectedUsers.set(userId, socket.id);
     socket.join(`user:${userId}`);
 
@@ -38,7 +39,10 @@ function initSocket(server) {
     socket.on('send_message', async (data, callback) => {
       try {
         let { conversationId, receiverId, content, replyToId } = data;
+        console.log(`Socket: send_message from ${userId} to ${receiverId} in conv ${conversationId}`);
+
         if (!conversationId) {
+          console.log('No conversationId provided, finding or creating 1:1');
           // Find or create 1:1 conversation
           const existing = await prisma.conversation.findFirst({
             where: {
@@ -77,6 +81,7 @@ function initSocket(server) {
         // Send to receiver if online
         const receiverSocketId = connectedUsers.get(receiverId);
         if (receiverSocketId) {
+          console.log(`Forwarding message to receiver socket: ${receiverSocketId}`);
           io.to(receiverSocketId).emit('new_message', { conversationId, message });
         }
 
