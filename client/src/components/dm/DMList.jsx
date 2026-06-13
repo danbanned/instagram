@@ -165,27 +165,35 @@ export default function DMList({ activeConversationId }) {
                 <div key={n.id} className={styles.noteItem}>
                   {n.isOwn ? (
                     <button className={styles.noteAvatarWrap} onClick={openNoteEdit}>
-                      {n.note && <div className={styles.noteBubble}>{n.note.substring(0, 16)}</div>}
-                      <div className={styles.noteRing}>
-                        <img
-                          src={n.avatar || '/default-avatar.png'}
-                          className={styles.noteAvatar}
-                          alt="you"
-                          onError={e => { e.target.src = '/default-avatar.png'; }}
-                        />
+                      <div className={styles.noteBubbleArea}>
+                        {n.note && <div className={styles.noteBubble}>{n.note.substring(0, 16)}</div>}
                       </div>
-                      {!n.note && <div className={styles.addNoteIcon}>+</div>}
+                      <div className={styles.noteRingWrap}>
+                        <div className={styles.noteRing}>
+                          <img
+                            src={n.avatar || '/default-avatar.png'}
+                            className={styles.noteAvatar}
+                            alt="you"
+                            onError={e => { e.target.src = '/default-avatar.png'; }}
+                          />
+                        </div>
+                        {!n.note && <div className={styles.addNoteIcon}>+</div>}
+                      </div>
                     </button>
                   ) : (
                     <button className={styles.noteAvatarWrap} onClick={() => navigate(`/messages/${n.id}`)}>
-                      {n.note && <div className={styles.noteBubble}>{n.note}</div>}
-                      <div className={styles.noteRingFriend}>
-                        <img
-                          src={n.avatar || '/default-avatar.png'}
-                          className={styles.noteAvatar}
-                          alt={n.label}
-                          onError={e => { e.target.src = '/default-avatar.png'; }}
-                        />
+                      <div className={styles.noteBubbleArea}>
+                        {n.note && <div className={styles.noteBubble}>{n.note}</div>}
+                      </div>
+                      <div className={styles.noteRingWrap}>
+                        <div className={styles.noteRingFriend}>
+                          <img
+                            src={n.avatar || '/default-avatar.png'}
+                            className={styles.noteAvatar}
+                            alt={n.label}
+                            onError={e => { e.target.src = '/default-avatar.png'; }}
+                          />
+                        </div>
                       </div>
                     </button>
                   )}

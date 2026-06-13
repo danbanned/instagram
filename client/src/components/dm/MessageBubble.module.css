@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   margin: 4px 0;
-  max-width: 85%;
+  max-width: 65%;
+  min-width: 0;
   position: relative;
 }
 
@@ -27,8 +28,12 @@
   border-radius: 18px;
   font-size: 14px;
   line-height: 1.4;
-  word-wrap: break-word;
+  /* Handle both normal word breaks and long runs like "Hahahaha..." */
+  overflow-wrap: anywhere;
+  word-break: break-word;
   position: relative;
+  /* Prevent bubble from shrinking below its text content */
+  min-width: 0;
 }
 
 .own .bubble {
@@ -45,6 +50,8 @@
 
 .text {
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .mediaImage {
