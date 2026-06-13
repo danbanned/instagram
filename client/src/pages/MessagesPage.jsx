@@ -11,47 +11,38 @@ export default function MessagesPage() {
   const [otherUser, setOtherUser] = useState(null);
 
   useEffect(() => {
-    if (conversationId) {
-      // We need to know who the other user is in this conversation
-      // We can get this from the conversation details
-      const fetchConversationDetails = async () => {
-        try {
-          // This endpoint could be optimized to just get metadata
-          const response = await api.get('/messages/conversations');
-          const currentConv = response.data.conversations.find(c => c.id === conversationId);
-          if (currentConv) {
-            setOtherUser(currentConv.otherUser);
-          }
-        } catch (error) {
-          console.error('Failed to fetch conversation details:', error);
-        }
-      };
-      fetchConversationDetails();
-    } else {
-      setOtherUser(null);
-    }
+    if (!conversationId) { setOtherUser(null); return; }
+
+    const fetchDetails = async () => {
+      try {
+        const res = await api.get('/messages/conversations');
+        const conv = res.data.conversations.find(c => c.id === conversationId);
+        if (conv) setOtherUser(conv.otherUser);
+      } catch (e) {
+        console.error('Failed to fetch conversation details:', e);
+      }
+    };
+    fetchDetails();
   }, [conversationId]);
 
   return (
     <main className={styles.page}>
       <div className={styles.sidebar}>
-        <DMList />
+        <DMList activeConversationId={conversationId} />
       </div>
 
       <div className={styles.chat}>
         {conversationId ? (
-          <ChatThread 
-            conversationId={conversationId} 
-            otherUser={otherUser} 
-          />
+          <ChatThread conversationId={conversationId} otherUser={otherUser} />
         ) : (
           <div className={styles.noChat}>
-            <span className={styles.noChatIcon}>💬</span>
+            <div className={styles.noChatIconWrap}>
+              <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
             <h3 className={styles.noChatTitle}>Your messages</h3>
             <p className={styles.noChatSub}>Send a message to start a chat.</p>
-            <button className={styles.startBtn} onClick={() => {/* handle new message modal? */}}>
-              Send message
-            </button>
           </div>
         )}
       </div>

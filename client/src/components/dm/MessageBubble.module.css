@@ -32,13 +32,13 @@
 }
 
 .own .bubble {
-  background-color: #efefef;
-  color: #000;
+  background-color: #0095f6;
+  color: #fff;
   border-bottom-right-radius: 4px;
 }
 
 .other .bubble {
-  border: 1px solid #dbdbdb;
+  background-color: #efefef;
   color: #000;
   border-bottom-left-radius: 4px;
 }

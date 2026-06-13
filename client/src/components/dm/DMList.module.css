@@ -2,65 +2,499 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: var(--bg-primary);
+  overflow: hidden;
 }
 
-.title {
-  padding: 20px;
-  font-size: 20px;
-  border-bottom: 1px solid #dbdbdb;
-}
-
-.conversations {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.conversationLink {
-  text-decoration: none;
-  color: inherit;
-}
-
-.conversationItem {
+/* ── Header ── */
+.header {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+}
+
+.usernameArea {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  padding: 0;
 }
 
-.conversationItem:hover {
-  background-color: #fafafa;
+.usernameText {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  margin-right: 12px;
-  object-fit: cover;
+.chevron {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-top: 2px;
 }
 
-.details {
+.newMsgBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.newMsgBtn:hover {
+  background: var(--bg-secondary);
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  padding: 0 20px;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
   flex: 1;
+  background: none;
+  border: none;
+  padding: 10px 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  color: var(--text-primary);
+  font-weight: 600;
+  border-bottom-color: var(--text-primary);
+}
+
+/* ── Search ── */
+.searchWrap {
+  padding: 10px 16px 8px;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #efefef;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.searchInput::placeholder {
+  color: var(--text-secondary);
+}
+
+/* ── Scroll area ── */
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* ── Notes row ── */
+.notesRow {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notesRow::-webkit-scrollbar {
+  display: none;
+}
+
+.noteItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 64px;
+}
+
+.noteAvatarWrap {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.noteBubble {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 4px 6px;
+  font-size: 10px;
+  color: var(--text-primary);
+  max-width: 72px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  line-height: 1.3;
+}
+
+.noteRing {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noteRingFriend {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  padding: 2px;
+  background: #dbdbdb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noteAvatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: white;
+  border: 2px solid white;
+}
+
+.addNoteIcon {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: #0095f6;
+  color: white;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  line-height: 1;
+}
+
+.noteLabel {
+  font-size: 11px;
+  color: var(--text-primary);
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* ── Conversation list ── */
+.convList {
   display: flex;
   flex-direction: column;
 }
 
-.username {
-  font-size: 14px;
+.convItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background 0.15s;
+  border-radius: 0;
 }
 
-.lastMessage {
-  font-size: 14px;
-  color: #737373;
-  margin-top: 4px;
+.convItem:hover {
+  background: var(--bg-secondary);
 }
 
-.unreadBadge {
-  background-color: #0095f6;
-  color: white;
+.convItemActive {
+  background: var(--bg-secondary);
+}
+
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.convAvatar {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  padding: 2px 6px;
+  object-fit: cover;
+  background: #dbdbdb;
+}
+
+.convBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.convName {
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.convLast {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bold {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.convRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0095f6;
+}
+
+.empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ── Note edit overlay ── */
+.noteOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noteEditBox {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.noteEditAvatar img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.noteEditHint {
+  font-size: 13px;
+  color: #8e8e8e;
+  text-align: center;
+  margin: 0;
+}
+
+.noteEditInput {
+  width: 100%;
+  border: 1px solid #dbdbdb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.noteEditCount {
   font-size: 12px;
-  font-weight: bold;
+  color: #8e8e8e;
+  align-self: flex-end;
+}
+
+.noteEditActions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.noteEditCancel {
+  flex: 1;
+  padding: 10px;
+  background: #efefef;
+  color: #262626;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.noteEditShare {
+  flex: 1;
+  padding: 10px;
+  background: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── Requests pane ── */
+.requestsPane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+
+.requestsHiddenRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hiddenIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+
+.hiddenLabel {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hiddenChevron {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.requestsHint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 12px 20px 0;
+  margin: 0;
+}
+
+.requestsEmptyCenter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.requestsCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+
+.requestsTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.requestsDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 280px;
+}
+
+.deleteAllBtn {
+  margin: 0 16px 16px;
+  background: none;
+  border: none;
+  color: #ed4956;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  text-align: left;
 }

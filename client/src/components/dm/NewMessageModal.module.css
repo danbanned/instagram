@@ -1,0 +1,223 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  width: 400px;
+  max-height: 560px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px;
+  position: relative;
+  border-bottom: 1px solid #efefef;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #262626;
+  padding: 4px;
+  line-height: 1;
+}
+
+/* To row */
+.toRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #efefef;
+}
+
+.toLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: #262626;
+  flex-shrink: 0;
+}
+
+.toInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #262626;
+  background: none;
+}
+
+.toInput::placeholder {
+  color: #8e8e8e;
+}
+
+.loadingDot {
+  font-size: 14px;
+  color: #8e8e8e;
+  letter-spacing: 2px;
+}
+
+.divider {
+  height: 1px;
+  background: #efefef;
+}
+
+/* Section label */
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #262626;
+  padding: 12px 20px 4px;
+  margin: 0;
+}
+
+/* Contact list */
+.contactList {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.contactItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.contactItem:hover {
+  background: #fafafa;
+}
+
+.contactSelected {
+  background: #fafafa;
+}
+
+.contactAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #dbdbdb;
+  flex-shrink: 0;
+}
+
+.contactInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.contactName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactUsername {
+  font-size: 13px;
+  color: #8e8e8e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Checkbox */
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #dbdbdb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.checkboxSelected {
+  background: #0095f6;
+  border-color: #0095f6;
+}
+
+.checkmark {
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.empty {
+  text-align: center;
+  color: #8e8e8e;
+  font-size: 14px;
+  padding: 32px 20px;
+  margin: 0;
+}
+
+/* Footer */
+.footer {
+  padding: 12px 16px 16px;
+  border-top: 1px solid #efefef;
+}
+
+.chatBtn {
+  width: 100%;
+  padding: 12px;
+  background: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.chatBtn:hover {
+  background: #0077cc;
+}
+
+.chatBtnDisabled {
+  background: #b2dffc;
+  cursor: default;
+}
+
+.chatBtnDisabled:hover {
+  background: #b2dffc;
+}
