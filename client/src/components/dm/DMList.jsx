@@ -25,22 +25,33 @@ export default function DMList() {
         setConversations(prev => {
           const idx = prev.findIndex(c => c.id === data.conversationId);
           if (idx === -1) {
-            // If it's a new conversation, we might need to fetch it or wait for a refresh
-            // For now, let's just refresh if not found
             fetchConversations();
             return prev;
           }
           const updated = [...prev];
-          updated[idx].lastMessage = data.message.content;
-          updated[idx].unreadCount += 1;
-          const moved = updated.splice(idx, 1)[0];
-          return [moved, ...updated];
+          const conv = { ...updated[idx] };
+          conv.lastMessage = data.message.content || 'Media';
+          conv.lastMessageAt = data.message.createdAt;
+          if (data.message.senderId !== socket.userId) {
+            conv.unreadCount = (conv.unreadCount || 0) + 1;
+          }
+          updated.splice(idx, 1);
+          return [conv, ...updated];
         });
+      });
+
+      socket.on('messages_read', ({ conversationId }) => {
+        setConversations(prev => prev.map(c => 
+          c.id === conversationId ? { ...c, unreadCount: 0 } : c
+        ));
       });
     }
 
     return () => {
-      if (socket) socket.off('new_message');
+      if (socket) {
+        socket.off('new_message');
+        socket.off('messages_read');
+      }
     };
   }, [socket]);
 

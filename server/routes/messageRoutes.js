@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../config/prisma');
 const { protect } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 // Get all conversations for the logged‑in user
 router.get('/conversations', protect, async (req, res) => {
@@ -22,36 +23,34 @@ router.get('/conversations', protect, async (req, res) => {
     // Fetch other user details for 1:1 chats
     const enriched = await Promise.all(conversations.map(async (conv) => {
       try {
-        const otherId = conv.participants.find(p => p !== userId);
-        const otherUser = otherId ? await prisma.user.findUnique({
-          where: { id: otherId },
-          select: { id: true, username: true, avatarUrl: true }
-        }) : null;
-        
-        let unreadCount = 0;
-        if (otherId) {
-          unreadCount = await prisma.message.count({
-            where: {
-              conversationId: conv.id,
-              senderId: otherId,
-              isRead: false
-            }
-          });
+        let otherUser = null;
+        if (!conv.isGroup) {
+          const otherId = conv.participants.find(p => p !== userId);
+          otherUser = otherId ? await prisma.user.findUnique({
+            where: { id: otherId },
+            select: { id: true, username: true, avatarUrl: true }
+          }) : null;
         }
+        
+        const unreadCount = await prisma.message.count({
+          where: {
+            conversationId: conv.id,
+            senderId: { not: userId },
+            isRead: false
+          }
+        });
 
         return {
-          id: conv.id,
+          ...conv,
           lastMessage: conv.messages[0]?.content,
-          lastMessageAt: conv.lastMessageAt,
           otherUser,
           unreadCount
         };
       } catch (innerError) {
         console.error(`Error enriching conversation ${conv.id}:`, innerError);
         return {
-          id: conv.id,
+          ...conv,
           lastMessage: conv.messages[0]?.content,
-          lastMessageAt: conv.lastMessageAt,
           otherUser: null,
           unreadCount: 0
         };
@@ -77,8 +76,6 @@ router.post('/conversations', protect, async (req, res) => {
       return res.status(400).json({ error: 'otherUserId required' });
     }
 
-    // Ensure we don't create a conversation with ourselves unless explicitly intended
-    // but the query hasEvery: [userId, otherUserId] might match any conv with userId if userId === otherUserId
     let conversation = await prisma.conversation.findFirst({
       where: {
         participants: { hasEvery: [userId, otherUserId] },
@@ -86,9 +83,7 @@ router.post('/conversations', protect, async (req, res) => {
       }
     });
 
-    // If searching for 1:1, ensure exactly those two
     if (conversation && conversation.participants.length !== 2 && userId !== otherUserId) {
-      // If we found a group or something else, it's not our 1:1
       conversation = null; 
     }
 
@@ -115,26 +110,83 @@ router.get('/:conversationId', protect, async (req, res) => {
     const { conversationId } = req.params;
     const userId = req.user.id;
 
+    console.log(`GET /messages/${conversationId}: userId=${userId}`);
+
     const conversation = await prisma.conversation.findFirst({
       where: { id: conversationId, participants: { has: userId } }
     });
     
     if (!conversation) {
+      console.log('Conversation not found or user not authorized');
       return res.status(403).json({ error: 'Not part of this conversation' });
     }
 
     const messages = await prisma.message.findMany({
       where: {
         conversationId,
-        deletedFor: { not: { has: userId } }
+        // Using a more explicit query for deletedFor
+        OR: [
+          { deletedFor: { equals: [] } },
+          { NOT: { deletedFor: { has: userId } } }
+        ]
       },
       include: {
-        sender: { select: { id: true, username: true, avatarUrl: true } }
+        sender: { select: { id: true, username: true, avatarUrl: true } },
+        replyTo: { include: { sender: { select: { username: true } } } },
+        reactions: { include: { user: { select: { username: true } } } },
+        poll: { include: { options: true } }
       },
       orderBy: { createdAt: 'asc' }
     });
 
+    console.log(`Found ${messages.length} messages for conversation ${conversationId}`);
     res.json({ messages });
+  } catch (error) {
+    console.error('GET /messages/:conversationId error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /upload - Upload media for DM
+router.post('/upload', protect, upload.single('media'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    
+    // If using Cloudinary, req.file.path is the URL
+    // If using local storage, we might need to prepend the server URL
+    const mediaUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+    
+    res.json({ 
+      mediaUrl, 
+      mediaType: req.file.mimetype.startsWith('image') ? 'image' : 
+                 req.file.mimetype.startsWith('video') ? 'video' : 'audio'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PATCH /:messageId - Edit message (within 10 min)
+router.patch('/:messageId', protect, async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const { content } = req.body;
+    const userId = req.user.id;
+
+    const message = await prisma.message.findUnique({ where: { id: messageId } });
+    if (!message) return res.status(404).json({ error: 'Message not found' });
+    if (message.senderId !== userId) return res.status(403).json({ error: 'Not authorized' });
+
+    const diff = (new Date().getTime() - new Date(message.createdAt).getTime()) / 60000;
+    if (diff > 10) return res.status(400).json({ error: 'Cannot edit message after 10 minutes' });
+
+    const updated = await prisma.message.update({
+      where: { id: messageId },
+      data: { content, isEdited: true },
+      include: { sender: { select: { id: true, username: true, avatarUrl: true } } }
+    });
+
+    res.json({ message: updated });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

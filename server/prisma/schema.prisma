@@ -35,6 +35,7 @@ model User {
   reposts               Repost[]
   postTags              PostTag[]
   messages              Message[]
+  messageReactions      MessageReaction[]
   isFake                Boolean          @default(false)
 
   @@map("users")
@@ -50,6 +51,7 @@ model Conversation {
   isGroup       Boolean   @default(false)
   groupName     String?
   groupAvatar   String?
+  mutedBy       String[]  @default([])                        // user IDs who muted this conv
   
   messages      Message[]
 
@@ -67,19 +69,61 @@ model Message {
   isRead         Boolean   @default(false)
   readAt         DateTime? @map("read_at")
   isDeleted      Boolean   @default(false)
+  isEdited       Boolean   @default(false)
   deletedFor     String[]  @default([])                       // users who hid the message
   replyToId      String?   @map("reply_to_id") @db.Uuid
   createdAt      DateTime  @default(now())
+  
+  // For Polls
+  poll           Poll?
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation(fields: [senderId], references: [id])
   replyTo      Message?     @relation("MessageReply", fields: [replyToId], references: [id])
   replies      Message[]    @relation("MessageReply")
+  reactions    MessageReaction[]
 
   @@index([conversationId])
   @@index([senderId])
   @@index([createdAt])
   @@map("messages")
+}
+
+model MessageReaction {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  messageId String   @map("message_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  reaction  String
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+  @@map("message_reactions")
+}
+
+model Poll {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  messageId   String   @unique @map("message_id") @db.Uuid
+  question    String
+  expiresAt   DateTime?
+  
+  message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  options     PollOption[]
+
+  @@map("polls")
+}
+
+model PollOption {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pollId  String   @map("poll_id") @db.Uuid
+  text    String
+  voters  String[] @default([]) // User IDs
+
+  poll    Poll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  @@map("poll_options")
 }
 
 model Profile {

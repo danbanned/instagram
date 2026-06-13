@@ -134,6 +134,7 @@ function initSocket(server) {
     // ---------- Mark messages as read ----------
     socket.on('mark_read', async ({ conversationId, messageIds }) => {
       try {
+        console.log(`Socket: mark_read for user ${userId} in conv ${conversationId}`);
         // Find messages in this conversation where the sender is NOT the current user
         await prisma.message.updateMany({
           where: {
@@ -150,13 +151,172 @@ function initSocket(server) {
           where: { id: conversationId },
           select: { participants: true }
         });
-        const otherId = conv.participants.find(p => p !== userId);
-        const otherSocket = connectedUsers.get(otherId);
-        if (otherSocket) {
-          io.to(otherSocket).emit('messages_read', { conversationId, messageIds });
+        if (conv) {
+          const others = conv.participants.filter(p => p !== userId);
+          for (const pid of others) {
+            const pSocket = connectedUsers.get(pid);
+            if (pSocket) {
+              io.to(pSocket).emit('messages_read', { conversationId, messageIds, readBy: userId });
+            }
+          }
         }
       } catch (error) {
         console.error('Error marking messages as read:', error);
+      }
+    });
+
+    // ---------- React to message ----------
+    socket.on('react_to_message', async ({ messageId, reaction }) => {
+      try {
+        console.log(`Socket: react_to_message ${reaction} by ${userId} on ${messageId}`);
+        const updatedReaction = await prisma.messageReaction.upsert({
+          where: { messageId_userId: { messageId, userId } },
+          update: { reaction },
+          create: { messageId, userId, reaction },
+          include: { user: { select: { username: true } } }
+        });
+
+        const message = await prisma.message.findUnique({
+          where: { id: messageId },
+          select: { conversationId: true }
+        });
+
+        if (message) {
+          io.to(`user:${userId}`).emit('message_reaction_updated', { messageId, reaction: updatedReaction });
+          // Notify others
+          const conv = await prisma.conversation.findUnique({
+            where: { id: message.conversationId },
+            select: { participants: true }
+          });
+          const others = conv.participants.filter(p => p !== userId);
+          for (const pid of others) {
+            const pSocket = connectedUsers.get(pid);
+            if (pSocket) {
+              io.to(pSocket).emit('message_reaction_updated', { messageId, reaction: updatedReaction });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error reacting to message:', error);
+      }
+    });
+
+    // ---------- Edit message ----------
+    socket.on('edit_message', async ({ messageId, content }) => {
+      try {
+        const message = await prisma.message.findUnique({ where: { id: messageId } });
+        if (!message || message.senderId !== userId) return;
+
+        const diff = (new Date().getTime() - new Date(message.createdAt).getTime()) / 60000;
+        if (diff > 10) return;
+
+        const updated = await prisma.message.update({
+          where: { id: messageId },
+          data: { content, isEdited: true },
+          include: { 
+            sender: { select: { id: true, username: true, avatarUrl: true } },
+            conversation: { select: { participants: true } }
+          }
+        });
+
+        // Broadcast update
+        for (const pid of updated.conversation.participants) {
+          const pSocket = connectedUsers.get(pid);
+          if (pSocket) {
+            io.to(pSocket).emit('message_updated', { message: updated });
+          }
+        }
+      } catch (error) {
+        console.error('Error editing message:', error);
+      }
+    });
+
+    // ---------- Create Poll ----------
+    socket.on('create_poll', async ({ conversationId, receiverId, question, options }) => {
+      try {
+        // Create base message first
+        const message = await prisma.message.create({
+          data: {
+            conversationId,
+            senderId: userId,
+            content: `Poll: ${question}`
+          }
+        });
+
+        const poll = await prisma.poll.create({
+          data: {
+            messageId: message.id,
+            question,
+            options: {
+              create: options.map(opt => ({ text: opt }))
+            }
+          },
+          include: { options: true }
+        });
+
+        const fullMessage = await prisma.message.findUnique({
+          where: { id: message.id },
+          include: {
+            sender: { select: { id: true, username: true, avatarUrl: true } },
+            poll: { include: { options: true } }
+          }
+        });
+
+        // Notify
+        const conv = await prisma.conversation.findUnique({
+          where: { id: conversationId },
+          select: { participants: true }
+        });
+        for (const pid of conv.participants) {
+          const pSocket = connectedUsers.get(pid);
+          if (pSocket) {
+            io.to(pSocket).emit('new_message', { conversationId, message: fullMessage });
+          }
+        }
+      } catch (error) {
+        console.error('Error creating poll:', error);
+      }
+    });
+
+    // ---------- Vote Poll ----------
+    socket.on('vote_poll', async ({ pollOptionId }) => {
+      try {
+        const option = await prisma.pollOption.findUnique({
+          where: { id: pollOptionId },
+          include: { poll: { include: { message: { select: { conversationId: true } } } } }
+        });
+        if (!option) return;
+
+        let newVoters = option.voters;
+        if (newVoters.includes(userId)) {
+          newVoters = newVoters.filter(v => v !== userId);
+        } else {
+          newVoters.push(userId);
+        }
+
+        const updatedOption = await prisma.pollOption.update({
+          where: { id: pollOptionId },
+          data: { voters: newVoters }
+        });
+
+        const poll = await prisma.poll.findUnique({
+          where: { id: option.pollId },
+          include: { options: true }
+        });
+
+        // Broadcast
+        const conv = await prisma.conversation.findUnique({
+          where: { id: option.poll.message.conversationId },
+          select: { participants: true }
+        });
+        for (const pid of conv.participants) {
+          const pSocket = connectedUsers.get(pid);
+          if (pSocket) {
+            io.to(pSocket).emit('poll_updated', { pollId: option.pollId, poll });
+          }
+        }
+      } catch (error) {
+        console.error('Error voting in poll:', error);
       }
     });
 

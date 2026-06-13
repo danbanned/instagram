@@ -1,0 +1,189 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0;
+  max-width: 85%;
+  position: relative;
+}
+
+.own {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.other {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.bubbleContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bubble {
+  padding: 8px 12px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.own .bubble {
+  background-color: #efefef;
+  color: #000;
+  border-bottom-right-radius: 4px;
+}
+
+.other .bubble {
+  border: 1px solid #dbdbdb;
+  color: #000;
+  border-bottom-left-radius: 4px;
+}
+
+.text {
+  white-space: pre-wrap;
+}
+
+.mediaImage {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+  display: block;
+}
+
+.mediaVideo {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+}
+
+.mediaAudio {
+  max-width: 240px;
+}
+
+.deleted {
+  font-style: italic;
+  color: #8e8e8e;
+}
+
+.edited {
+  font-size: 10px;
+  color: #8e8e8e;
+  margin-left: 4px;
+}
+
+.replyRef {
+  background-color: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin-bottom: -8px;
+  opacity: 0.8;
+  max-width: 200px;
+}
+
+.replySender {
+  font-weight: bold;
+  color: #0095f6;
+  display: block;
+}
+
+.replyContent {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reactions {
+  display: flex;
+  gap: 2px;
+  margin-top: -10px;
+  background: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 10px;
+  padding: 2px 4px;
+  align-self: flex-start;
+  z-index: 1;
+}
+
+.own .reactions {
+  align-self: flex-end;
+}
+
+.reaction {
+  font-size: 12px;
+}
+
+.options {
+  display: flex;
+  gap: 8px;
+  background: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 16px;
+  padding: 4px 8px;
+  position: absolute;
+  top: -20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.own .options {
+  right: 0;
+}
+
+.other .options {
+  left: 0;
+}
+
+.options button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.time {
+  font-size: 10px;
+  color: #8e8e8e;
+  margin-top: 2px;
+}
+
+.poll {
+  min-width: 200px;
+}
+
+.pollQuestion {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.pollOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pollOption {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pollOption:hover {
+  background: #f8f8f8;
+}
+
+.voteCount {
+  font-weight: bold;
+  color: #0095f6;
+}

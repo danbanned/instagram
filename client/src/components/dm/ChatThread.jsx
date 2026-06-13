@@ -2,13 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import { getSocket } from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import MessageBubble from './MessageBubble';
+import MessageInput from './MessageInput';
+import ForwardModal from './ForwardModal';
 import styles from './ChatThread.module.css';
 
 export default function ChatThread({ conversationId, otherUser }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
   const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const [replyTo, setReplyTo] = useState(null);
+  const [forwardMessage, setForwardMessage] = useState(null);
   const socket = getSocket();
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -16,8 +20,10 @@ export default function ChatThread({ conversationId, otherUser }) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
+        console.log(`ChatThread: Fetching messages for ${conversationId}`);
         const response = await api.get(`/messages/${conversationId}`);
-        setMessages(response.data.messages);
+        console.log(`ChatThread: Received ${response.data.messages?.length} messages`);
+        setMessages(response.data.messages || []);
       } catch (error) {
         console.error('Failed to fetch messages:', error);
       }
@@ -28,7 +34,9 @@ export default function ChatThread({ conversationId, otherUser }) {
     }
 
     if (socket) {
+      console.log('ChatThread: Setting up socket listeners');
       socket.on('new_message', (data) => {
+        console.log('ChatThread: new_message received', data);
         if (data.conversationId === conversationId) {
           setMessages(prev => [...prev, data.message]);
           socket.emit('mark_read', { conversationId, messageIds: [data.message.id] });
@@ -38,20 +46,38 @@ export default function ChatThread({ conversationId, otherUser }) {
       socket.on('user_typing', (data) => {
         if (data.conversationId === conversationId && data.userId === otherUser?.id) {
           setOtherUserTyping(data.isTyping);
-          
           if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-          
           if (data.isTyping) {
-            typingTimeoutRef.current = setTimeout(() => {
-              setOtherUserTyping(false);
-            }, 3000);
+            typingTimeoutRef.current = setTimeout(() => setOtherUserTyping(false), 3000);
           }
         }
+      });
+
+      socket.on('message_reaction_updated', ({ messageId, reaction }) => {
+        setMessages(prev => prev.map(m => {
+          if (m.id !== messageId) return m;
+          const reactions = m.reactions || [];
+          const idx = reactions.findIndex(r => r.userId === reaction.userId);
+          const updatedReactions = idx > -1 
+            ? reactions.map((r, i) => i === idx ? reaction : r)
+            : [...reactions, reaction];
+          return { ...m, reactions: updatedReactions };
+        }));
+      });
+
+      socket.on('message_updated', ({ message }) => {
+        setMessages(prev => prev.map(m => m.id === message.id ? { ...m, ...message } : m));
       });
 
       socket.on('message_deleted', ({ messageId }) => {
         setMessages(prev => prev.map(m => 
           m.id === messageId ? { ...m, isDeleted: true, content: 'Message deleted' } : m
+        ));
+      });
+
+      socket.on('poll_updated', ({ pollId, poll }) => {
+        setMessages(prev => prev.map(m => 
+          m.poll?.id === pollId ? { ...m, poll } : m
         ));
       });
     }
@@ -60,7 +86,10 @@ export default function ChatThread({ conversationId, otherUser }) {
       if (socket) {
         socket.off('new_message');
         socket.off('user_typing');
+        socket.off('message_reaction_updated');
+        socket.off('message_updated');
         socket.off('message_deleted');
+        socket.off('poll_updated');
       }
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     };
@@ -70,45 +99,65 @@ export default function ChatThread({ conversationId, otherUser }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = () => {
-    if (!newMessage.trim() || !socket) return;
+  const handleSendMessage = (data) => {
+    if (!socket) return;
     
     const tempId = `temp-${Date.now()}`;
-    // Local optimistic update
-    setMessages(prev => [...prev, { 
+    const optimisticMessage = { 
       id: tempId, 
-      content: newMessage, 
       senderId: user?.id, 
       createdAt: new Date().toISOString(),
-      isPending: true 
-    }]);
+      isPending: true,
+      sender: user,
+      ...data
+    };
+    
+    setMessages(prev => [...prev, optimisticMessage]);
 
     socket.emit('send_message', {
       conversationId,
       receiverId: otherUser?.id,
-      content: newMessage
+      ...data
     }, (response) => {
       if (response.success) {
-        setMessages(prev => prev.map(m => m.id === tempId ? response.message : m));
+        setMessages(prev => prev.map(m => m.id === optimisticMessage.id ? response.message : m));
       } else {
-        setMessages(prev => prev.filter(m => m.id !== tempId));
+        setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
         alert('Failed to send message: ' + response.error);
       }
     });
 
-    setNewMessage('');
-    socket.emit('typing', { conversationId, receiverId: otherUser?.id, isTyping: false });
+    setReplyTo(null);
   };
 
-  const handleTyping = (e) => {
-    setNewMessage(e.target.value);
+  const handleTyping = (isTyping) => {
     if (socket) {
-      socket.emit('typing', { 
-        conversationId, 
-        receiverId: otherUser?.id, 
-        isTyping: e.target.value.length > 0 
-      });
+      socket.emit('typing', { conversationId, receiverId: otherUser?.id, isTyping });
     }
+  };
+
+  const handleReact = (messageId, reaction) => {
+    socket?.emit('react_to_message', { messageId, reaction });
+  };
+
+  const handleDelete = (messageId) => {
+    if (window.confirm('Delete message for everyone?')) {
+      socket?.emit('delete_message', { messageId, forEveryone: true });
+    }
+  };
+
+  const handleVotePoll = (pollOptionId) => {
+    socket?.emit('vote_poll', { pollOptionId });
+  };
+
+  const handleForward = (messageId, targetConversationId) => {
+    socket?.emit('send_message', {
+      conversationId: targetConversationId,
+      originalMessageId: messageId, // Server can copy the content/media
+      forwarded: true
+    }, (response) => {
+      if (!response.success) alert('Failed to forward message');
+    });
   };
 
   return (
@@ -123,34 +172,34 @@ export default function ChatThread({ conversationId, otherUser }) {
 
       <div className={styles.messagesArea}>
         {messages.map(msg => (
-          <div key={msg.id} className={`${styles.message} ${msg.senderId === user?.id ? styles.sent : styles.received}`}>
-            <div className={styles.messageBubble}>
-              <div className={styles.content}>{msg.content}</div>
-              <div className={styles.time}>
-                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
-            </div>
-          </div>
+          <MessageBubble 
+            key={msg.id}
+            message={msg}
+            isOwn={msg.senderId === user?.id}
+            onReply={setReplyTo}
+            onReact={handleReact}
+            onDelete={handleDelete}
+            onVotePoll={handleVotePoll}
+            onForward={setForwardMessage}
+          />
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className={styles.inputArea}>
-        <input 
-          className={styles.messageInput}
-          value={newMessage} 
-          onChange={handleTyping} 
-          onKeyPress={e => e.key === 'Enter' && sendMessage()} 
-          placeholder="Message..." 
+      <MessageInput 
+        onSendMessage={handleSendMessage}
+        onTyping={handleTyping}
+        replyTo={replyTo}
+        onCancelReply={() => setReplyTo(null)}
+      />
+
+      {forwardMessage && (
+        <ForwardModal 
+          message={forwardMessage}
+          onClose={() => setForwardMessage(null)}
+          onForward={handleForward}
         />
-        <button 
-          className={styles.sendButton}
-          onClick={sendMessage} 
-          disabled={!newMessage.trim()}
-        >
-          Send
-        </button>
-      </div>
+      )}
     </div>
   );
 }

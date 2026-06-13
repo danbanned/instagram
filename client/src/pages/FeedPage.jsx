@@ -8,6 +8,7 @@ import RightSidebar from '../components/RightSidebar';
 import PostComposer from '../components/PostComposer';
 import FeedList from '../components/FeedList';
 import StoriesTray from '../components/StoriesTray';
+import FloatingMessagesBox from '../components/FloatingMessagesBox';
 
 export default function FeedPage() {
   const { user } = useAuth();
@@ -194,6 +195,7 @@ export default function FeedPage() {
       </main>
 
       <RightSidebar user={user} />
+      <FloatingMessagesBox />
     </>
   );
 }

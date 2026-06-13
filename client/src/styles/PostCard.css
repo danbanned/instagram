@@ -1,8 +1,8 @@
 .ig-post {
-  background: #fff;
-  border: 1px solid #dbdbdb;
-  border-radius: 12px;
-  margin-bottom: 24px;
+  background: var(--bg-primary);
+  border: none;
+  border-radius: 0;
+  margin-bottom: 8px;
   overflow: hidden;
   position: relative;
   z-index: 1;

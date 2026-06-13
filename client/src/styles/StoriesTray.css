@@ -1,8 +1,7 @@
 .stories-tray {
   position: relative;
-  background: #fff;
-  border-bottom: 1px solid #dbdbdb;
-  padding: 16px 0;
+  background: var(--bg-primary);
+  padding: 10px 0;
   overflow: hidden;
 }
 
@@ -46,8 +45,8 @@
 }
 
 .story-ring {
-  width: 68px;
-  height: 68px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   padding: 2px;
   background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
@@ -65,8 +64,8 @@
 }
 
 .story-avatar {
-  width: 64px;
-  height: 64px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: #fff;
   display: flex;
@@ -76,8 +75,8 @@
 }
 
 .story-avatar img {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
 }

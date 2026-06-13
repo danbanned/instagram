@@ -2,7 +2,6 @@
   position: sticky;
   top: 0;
   background: var(--nav-bg);
-  border-bottom: 1px solid var(--border-color);
   z-index: 50;
   width: 100%;
 }
@@ -11,7 +10,7 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
-  height: 60px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,13 +20,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   text-decoration: none;
   white-space: nowrap;
   min-width: fit-content;
-  padding-right: 16px;
+  margin-right: auto;
 }
 
 .logo-text {

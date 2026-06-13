@@ -4,6 +4,7 @@ import CreateDropdown from './CreateDropdown';
 import StoryCreator   from './StoryCreator';
 import MoreMenu       from './MoreMenu';
 import NotificationBadge from './notifications/NotificationBadge';
+import { useUnreadCount } from '../hooks/useUnreadCount';
 import './LeftSidebar.css';
 
 const NAV_ITEMS = [
@@ -20,6 +21,7 @@ export default function LeftSidebar({ user }) {
   const navigate  = useNavigate();
   const createRef = useRef(null);
   const moreRef   = useRef(null);
+  const unreadMessages = useUnreadCount();
 
   const [dropdownOpen,    setDropdownOpen]    = useState(false);
   const [storyCreatorOpen, setStoryCreatorOpen] = useState(false);
@@ -42,7 +44,8 @@ export default function LeftSidebar({ user }) {
     <>
       <aside className="left-sidebar">
         <div className="sidebar-logo">
-          <Link to="/">
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <span className="logo-icon">📷</span>
             <span className="logo-text">Instagram</span>
           </Link>
         </div>
@@ -57,6 +60,9 @@ export default function LeftSidebar({ user }) {
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>
               {item.path === '/notifications' && <NotificationBadge />}
+              {item.path === '/messages' && unreadMessages > 0 && (
+                <span className="badge unread-dot">{unreadMessages}</span>
+              )}
             </Link>
           ))}
 
@@ -83,10 +89,6 @@ export default function LeftSidebar({ user }) {
         </nav>
 
         <div className="sidebar-footer">
-          <Link to="/threads" className="nav-item">
-            <span className="nav-icon">@</span>
-            <span className="nav-label">Threads</span>
-          </Link>
           <button
             ref={moreRef}
             className={`nav-item more-btn ${moreOpen ? 'active' : ''}`}
@@ -95,6 +97,10 @@ export default function LeftSidebar({ user }) {
             <span className="nav-icon">☰</span>
             <span className="nav-label">More</span>
           </button>
+          <div className="nav-item also-from-meta" style={{ cursor: 'default' }}>
+            <span className="nav-icon" style={{ fontSize: '20px' }}>⊞</span>
+            <span className="nav-label">Also from Meta</span>
+          </div>
         </div>
       </aside>
 
