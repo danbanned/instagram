@@ -256,6 +256,11 @@
   flex-direction: column;
 }
 
+/* Wrapper holds Link + hover actions + dropdown menu */
+.convItemWrap {
+  position: relative;
+}
+
 .convItem {
   display: flex;
   align-items: center;
@@ -273,6 +278,86 @@
 
 .convItemActive {
   background: var(--bg-secondary);
+}
+
+.convItemMuted {
+  opacity: 0.55;
+}
+
+.mutedTag {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Hover action buttons (Mute + ⋮) */
+.hoverActions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 2px 4px;
+  box-shadow: -4px 0 8px var(--bg-primary);
+  z-index: 2;
+}
+
+.hoverBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  min-height: unset;
+}
+
+.hoverBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Dropdown menu */
+.convMenu {
+  position: absolute;
+  right: 12px;
+  top: calc(100% - 8px);
+  background: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  z-index: 200;
+  min-width: 180px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.convMenuItem {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: background 0.12s;
+  min-height: unset;
+  border-radius: 0;
+}
+
+.convMenuItem:hover {
+  background: var(--bg-secondary);
+}
+
+.convMenuDelete {
+  color: #ed4956;
 }
 
 .avatarWrap {
@@ -420,6 +505,28 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Note comment modal — reuses the edit box layout, extra quote styles */
+.noteCommentTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.noteCommentQuote {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  max-width: 100%;
+  word-break: break-word;
 }
 
 /* ── Requests pane ── */

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getSocket } from '../../services/socket';
 import useAuth from '../../hooks/useAuth';
@@ -34,6 +34,15 @@ export default function DMList({ activeConversationId }) {
   const [noteInput, setNoteInput] = useState('');
   const [showNewMessage, setShowNewMessage] = useState(false);
   const noteInputRef = useRef(null);
+
+  // Note comment modal
+  const [commentingNote, setCommentingNote] = useState(null); // { id, label, note }
+  const [commentText, setCommentText] = useState('');
+  const commentInputRef = useRef(null);
+
+  // Conversation hover actions
+  const [hoveredConvId, setHoveredConvId] = useState(null);
+  const [menuConvId, setMenuConvId] = useState(null);
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -86,6 +95,51 @@ export default function DMList({ activeConversationId }) {
     setEditingNote(true);
     setTimeout(() => noteInputRef.current?.focus(), 50);
   };
+
+  // Note comment handlers
+  const openNoteComment = (n) => {
+    setCommentingNote(n);
+    setCommentText('');
+    setTimeout(() => commentInputRef.current?.focus(), 50);
+  };
+
+  const postNoteComment = () => {
+    if (!commentText.trim()) return;
+    // Replying to a note navigates to that DM conversation (same as Instagram)
+    navigate(`/messages/${commentingNote.id}`);
+    setCommentingNote(null);
+  };
+
+  // Conversation action handlers
+  useEffect(() => {
+    if (!menuConvId) return;
+    const close = () => setMenuConvId(null);
+    const timer = setTimeout(() => document.addEventListener('click', close), 0);
+    return () => { clearTimeout(timer); document.removeEventListener('click', close); };
+  }, [menuConvId]);
+
+  const handleMuteConv = useCallback((e, convId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setConversations(prev => prev.map(c => c.id === convId ? { ...c, isMuted: !c.isMuted } : c));
+    setMenuConvId(null);
+  }, []);
+
+  const handleMarkUnread = useCallback((e, convId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setConversations(prev => prev.map(c =>
+      c.id === convId ? { ...c, unreadCount: (c.unreadCount || 0) > 0 ? 0 : 1 } : c
+    ));
+    setMenuConvId(null);
+  }, []);
+
+  const handleDeleteConv = useCallback((e, convId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setConversations(prev => prev.filter(c => c.id !== convId));
+    setMenuConvId(null);
+  }, []);
 
   const filtered = conversations.filter(c => {
     const name = c.isGroup ? (c.groupName || '') : (c.otherUser?.username || '');
@@ -181,7 +235,10 @@ export default function DMList({ activeConversationId }) {
                       </div>
                     </button>
                   ) : (
-                    <button className={styles.noteAvatarWrap} onClick={() => navigate(`/messages/${n.id}`)}>
+                    <button
+                      className={styles.noteAvatarWrap}
+                      onClick={() => n.note ? openNoteComment(n) : navigate(`/messages/${n.id}`)}
+                    >
                       <div className={styles.noteBubbleArea}>
                         {n.note && <div className={styles.noteBubble}>{n.note}</div>}
                       </div>
@@ -216,32 +273,89 @@ export default function DMList({ activeConversationId }) {
                   const avatar = conv.isGroup ? null : conv.otherUser?.avatarUrl;
                   const isActive = conv.id === activeConversationId;
                   const hasUnread = (conv.unreadCount || 0) > 0;
+                  const isHovered = hoveredConvId === conv.id;
+                  const menuOpen = menuConvId === conv.id;
 
                   return (
-                    <Link
+                    <div
                       key={conv.id}
-                      to={`/messages/${conv.id}`}
-                      className={`${styles.convItem} ${isActive ? styles.convItemActive : ''}`}
+                      className={styles.convItemWrap}
+                      onMouseEnter={() => setHoveredConvId(conv.id)}
+                      onMouseLeave={() => setHoveredConvId(null)}
                     >
-                      <div className={styles.avatarWrap}>
-                        <img
-                          src={avatar || '/default-avatar.png'}
-                          className={styles.convAvatar}
-                          alt={name}
-                          onError={e => { e.target.src = '/default-avatar.png'; }}
-                        />
-                      </div>
-                      <div className={styles.convBody}>
-                        <span className={`${styles.convName} ${hasUnread ? styles.bold : ''}`}>{name}</span>
-                        <span className={`${styles.convLast} ${hasUnread ? styles.bold : ''}`}>
-                          {conv.lastMessage?.substring(0, 35) || 'Tap to chat'}
-                          {conv.lastMessageAt ? ` · ${formatTimestamp(conv.lastMessageAt || conv.updatedAt)}` : ''}
-                        </span>
-                      </div>
-                      <div className={styles.convRight}>
-                        {hasUnread && <span className={styles.unreadDot} />}
-                      </div>
-                    </Link>
+                      <Link
+                        to={`/messages/${conv.id}`}
+                        className={`${styles.convItem} ${isActive ? styles.convItemActive : ''} ${conv.isMuted ? styles.convItemMuted : ''}`}
+                      >
+                        <div className={styles.avatarWrap}>
+                          <img
+                            src={avatar || '/default-avatar.png'}
+                            className={styles.convAvatar}
+                            alt={name}
+                            onError={e => { e.target.src = '/default-avatar.png'; }}
+                          />
+                        </div>
+                        <div className={styles.convBody}>
+                          <span className={`${styles.convName} ${hasUnread ? styles.bold : ''}`}>{name}</span>
+                          <span className={`${styles.convLast} ${hasUnread ? styles.bold : ''}`}>
+                            {conv.isMuted && <span className={styles.mutedTag}>Muted · </span>}
+                            {conv.lastMessage?.substring(0, 35) || 'Tap to chat'}
+                            {conv.lastMessageAt ? ` · ${formatTimestamp(conv.lastMessageAt || conv.updatedAt)}` : ''}
+                          </span>
+                        </div>
+                        <div className={styles.convRight}>
+                          {hasUnread && !isHovered && <span className={styles.unreadDot} />}
+                        </div>
+                      </Link>
+
+                      {isHovered && (
+                        <div className={styles.hoverActions}>
+                          <button
+                            className={styles.hoverBtn}
+                            title={conv.isMuted ? 'Unmute' : 'Mute'}
+                            onClick={(e) => handleMuteConv(e, conv.id)}
+                          >
+                            {conv.isMuted ? (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" />
+                              </svg>
+                            ) : (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                              </svg>
+                            )}
+                          </button>
+                          <button
+                            className={styles.hoverBtn}
+                            title="More options"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuConvId(menuOpen ? null : conv.id); }}
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                              <circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+
+                      {menuOpen && (
+                        <div className={styles.convMenu} onClick={e => e.stopPropagation()}>
+                          <button className={styles.convMenuItem} onClick={(e) => handleMarkUnread(e, conv.id)}>
+                            {hasUnread ? 'Mark as read' : 'Mark as unread'}
+                          </button>
+                          <button className={styles.convMenuItem} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuConvId(null); }}>
+                            Unpin
+                          </button>
+                          <button className={styles.convMenuItem} onClick={(e) => handleMuteConv(e, conv.id)}>
+                            {conv.isMuted ? 'Unmute' : 'Mute'}
+                          </button>
+                          <button className={`${styles.convMenuItem} ${styles.convMenuDelete}`} onClick={(e) => handleDeleteConv(e, conv.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   );
                 })
               )}
@@ -271,6 +385,43 @@ export default function DMList({ activeConversationId }) {
             <div className={styles.noteEditActions}>
               <button className={styles.noteEditCancel} onClick={() => setEditingNote(false)}>Cancel</button>
               <button className={styles.noteEditShare} onClick={saveNote}>Share</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {commentingNote && (
+        <div className={styles.noteOverlay} onClick={() => setCommentingNote(null)}>
+          <div className={styles.noteEditBox} onClick={e => e.stopPropagation()}>
+            <div className={styles.noteEditAvatar}>
+              <img
+                src={commentingNote.avatar || '/default-avatar.png'}
+                alt={commentingNote.label}
+                onError={e => { e.target.src = '/default-avatar.png'; }}
+              />
+            </div>
+            <p className={styles.noteCommentTitle}>Reply to {commentingNote.label}'s note</p>
+            <p className={styles.noteCommentQuote}>"{commentingNote.note}"</p>
+            <textarea
+              ref={commentInputRef}
+              className={styles.noteEditInput}
+              value={commentText}
+              onChange={e => setCommentText(e.target.value.slice(0, 60))}
+              placeholder="Write a reply..."
+              rows={2}
+              maxLength={60}
+            />
+            <div className={styles.noteEditCount}>{commentText.length}/60</div>
+            <div className={styles.noteEditActions}>
+              <button className={styles.noteEditCancel} onClick={() => setCommentingNote(null)}>Cancel</button>
+              <button
+                className={styles.noteEditShare}
+                style={!commentText.trim() ? { background: '#b2dffc' } : {}}
+                disabled={!commentText.trim()}
+                onClick={postNoteComment}
+              >
+                Send
+              </button>
             </div>
           </div>
         </div>
