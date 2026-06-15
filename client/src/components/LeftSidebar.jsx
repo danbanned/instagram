@@ -4,6 +4,7 @@ import CreateDropdown from './CreateDropdown';
 import StoryCreator   from './StoryCreator';
 import MoreMenu       from './MoreMenu';
 import NotificationBadge from './notifications/NotificationBadge';
+import NotificationsSidebar from './NotificationsSidebar';
 import { useUnreadCount } from '../hooks/useUnreadCount';
 import './LeftSidebar.css';
 
@@ -23,9 +24,10 @@ export default function LeftSidebar({ user }) {
   const moreRef   = useRef(null);
   const unreadMessages = useUnreadCount();
 
-  const [dropdownOpen,    setDropdownOpen]    = useState(false);
-  const [storyCreatorOpen, setStoryCreatorOpen] = useState(false);
-  const [moreOpen,        setMoreOpen]        = useState(false);
+  const [dropdownOpen,       setDropdownOpen]       = useState(false);
+  const [storyCreatorOpen,   setStoryCreatorOpen]   = useState(false);
+  const [moreOpen,           setMoreOpen]           = useState(false);
+  const [notificationsOpen,  setNotificationsOpen]  = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
@@ -51,20 +53,34 @@ export default function LeftSidebar({ user }) {
         </div>
 
         <nav className="sidebar-nav">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              <span className="nav-label">{item.label}</span>
-              {item.path === '/notifications' && <NotificationBadge />}
-              {item.path === '/messages' && unreadMessages > 0 && (
-                <span className="badge unread-dot">{unreadMessages}</span>
-              )}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            if (item.path === '/notifications') {
+              return (
+                <button
+                  key={item.path}
+                  className={`nav-item ${notificationsOpen ? 'active' : ''}`}
+                  onClick={() => setNotificationsOpen(o => !o)}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                  <NotificationBadge />
+                </button>
+              );
+            }
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+                {item.path === '/messages' && unreadMessages > 0 && (
+                  <span className="badge unread-dot">{unreadMessages}</span>
+                )}
+              </Link>
+            );
+          })}
 
           {/* Create button */}
           <button
@@ -120,6 +136,11 @@ export default function LeftSidebar({ user }) {
       )}
 
       <MoreMenu isOpen={moreOpen} onClose={() => setMoreOpen(false)} />
+
+      <NotificationsSidebar
+        isOpen={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+      />
     </>
   );
 }
