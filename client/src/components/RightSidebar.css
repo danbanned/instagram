@@ -1,9 +1,15 @@
 .right-sidebar {
   width: 320px;
-  padding: 16px 0 20px 24px;
+  padding: 12px 0 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: sticky;
+  top: 52px;
+  max-height: calc(100vh - 52px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  align-self: flex-start;
 }
 
 .current-user-card {
