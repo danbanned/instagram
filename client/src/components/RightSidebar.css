@@ -1,6 +1,6 @@
 .right-sidebar {
   width: 320px;
-  padding: 16px 0 20px 24px;
+  padding: 16px 0 20px 8px;
   display: flex;
   flex-direction: column;
   gap: 16px;
