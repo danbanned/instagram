@@ -1,19 +1,25 @@
 .notificationItem {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  padding: 12px 0;
+  padding: 10px 8px;
   text-decoration: none;
   color: inherit;
-  border-bottom: 1px solid #efefef;
+  border-radius: 10px;
   position: relative;
+  transition: background 0.15s;
+}
+
+.notificationItem:hover {
+  background: var(--bg-secondary);
 }
 
 .notificationItem.unread {
-  background: #f0f7ff;
-  margin: 0 -12px;
-  padding: 12px;
-  border-radius: 8px;
+  background: rgba(0, 149, 246, 0.06);
+}
+
+.notificationItem.unread:hover {
+  background: rgba(0, 149, 246, 0.1);
 }
 
 .avatar {
@@ -38,7 +44,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--bg-primary);
   font-size: 11px;
 }
 
@@ -48,21 +54,21 @@
 }
 
 .text {
-  color: #262626;
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.4;
 }
 
 .time {
-  margin-top: 4px;
-  color: #8e8e8e;
+  margin-top: 3px;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .unreadDot {
   width: 8px;
   height: 8px;
-  margin-top: 8px;
+  margin-top: 0;
   border-radius: 50%;
   background: #0095f6;
   flex-shrink: 0;

@@ -13,21 +13,40 @@ function groupNotifications(notifications) {
   const week = 7 * day;
   const month = 30 * day;
 
-  return notifications.reduce((acc, notification) => {
-    const age = now - new Date(notification.createdAt).getTime();
-    if (age < day) acc.today.push(notification);
-    else if (age < week) acc.thisWeek.push(notification);
-    else if (age < month) acc.thisMonth.push(notification);
-    else acc.older.push(notification);
+  return notifications.reduce((acc, n) => {
+    if (!n.isRead) {
+      acc.unread.push(n);
+    } else {
+      const age = now - new Date(n.createdAt).getTime();
+      if (age < day) acc.today.push(n);
+      else if (age < week) acc.thisWeek.push(n);
+      else if (age < month) acc.thisMonth.push(n);
+      else acc.older.push(n);
+    }
     return acc;
-  }, { today: [], thisWeek: [], thisMonth: [], older: [] });
+  }, { unread: [], today: [], thisWeek: [], thisMonth: [], older: [] });
+}
+
+// Client-side filter for tab types the API may not handle
+function filterByTab(notifications, tab) {
+  switch (tab) {
+    case 'comments':  return notifications.filter(n => n.type === 'comment');
+    case 'follows':   return notifications.filter(n => n.type === 'follow');
+    case 'mentions':  return notifications.filter(n => n.type === 'mention');
+    default:          return notifications;
+  }
 }
 
 export default function NotificationsPage() {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState([]);
+  const [allNotifications, setAllNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+
+  const notifications = useMemo(
+    () => filterByTab(allNotifications, activeTab),
+    [allNotifications, activeTab]
+  );
 
   const grouped = useMemo(() => groupNotifications(notifications), [notifications]);
 
@@ -36,7 +55,7 @@ export default function NotificationsPage() {
       setLoading(true);
       try {
         const data = await fetchNotifications({ type: activeTab });
-        setNotifications(data.notifications || []);
+        setAllNotifications(data.notifications || []);
       } catch (error) {
         console.error('Failed to fetch notifications:', error);
       } finally {
@@ -48,14 +67,13 @@ export default function NotificationsPage() {
   }, [activeTab]);
 
   useSocket(user?.id, (notification) => {
-    setNotifications((prev) => [notification, ...prev]);
+    setAllNotifications((prev) => [notification, ...prev]);
   });
 
   const handleMarkRead = async (id) => {
-    setNotifications((prev) => prev.map((notification) => (
-      notification.id === id ? { ...notification, isRead: true } : notification
-    )));
-
+    setAllNotifications((prev) => prev.map((n) =>
+      n.id === id ? { ...n, isRead: true } : n
+    ));
     try {
       await markNotificationRead(id);
     } catch (error) {
@@ -64,7 +82,7 @@ export default function NotificationsPage() {
   };
 
   const handleMarkAllRead = async () => {
-    setNotifications((prev) => prev.map((notification) => ({ ...notification, isRead: true })));
+    setAllNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     try {
       await markNotificationsRead();
     } catch (error) {
@@ -88,22 +106,17 @@ export default function NotificationsPage() {
 
         <NotificationTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div className={styles.infoBox}>
-          <span>🔔</span>
-          <div>
-            <strong>Activity On Your Posts</strong>
-            <p>When someone likes or comments on one of your posts, you&apos;ll see it here.</p>
-          </div>
-        </div>
-
         <div className={styles.notificationsList}>
+          <NotificationGroup title="New" notifications={grouped.unread} onMarkRead={handleMarkRead} />
           <NotificationGroup title="Today" notifications={grouped.today} onMarkRead={handleMarkRead} />
           <NotificationGroup title="This week" notifications={grouped.thisWeek} onMarkRead={handleMarkRead} />
           <NotificationGroup title="This month" notifications={grouped.thisMonth} onMarkRead={handleMarkRead} />
-          <NotificationGroup title="Older" notifications={grouped.older} onMarkRead={handleMarkRead} />
+          <NotificationGroup title="Earlier" notifications={grouped.older} onMarkRead={handleMarkRead} />
           {!notifications.length && <div className={styles.empty}>No notifications yet.</div>}
         </div>
+      </div>
 
+      <div className={styles.sidebar}>
         <SuggestedUsers />
       </div>
     </main>

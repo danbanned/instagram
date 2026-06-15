@@ -49,7 +49,7 @@ export default function NotificationItem({ notification, onMarkRead }) {
       onClick={() => onMarkRead(notification.id)}
     >
       <div className={styles.avatar}>
-        <img src={notification.sender?.avatar || '/default-avatar.png'} alt={notification.sender?.username || 'notification'} />
+        <img src={notification.sender?.avatarUrl || notification.sender?.avatar || '/default-avatar.png'} alt={notification.sender?.username || 'notification'} />
         <span className={styles.icon}>{getIcon(notification.type)}</span>
       </div>
       <div className={styles.content}>

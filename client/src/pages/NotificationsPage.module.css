@@ -1,18 +1,17 @@
 .notificationsContainer {
-  grid-column: 2 / span 2;
-  width: 100%;
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
   padding: 24px 20px 60px;
+  width: 100%;
 }
 
+/* ── Main notifications panel (left) ── */
 .panel {
-  width: min(420px, 100%);
-  margin-left: auto;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 20px;
-  position: sticky;
-  top: 84px;
+  flex: 1;
+  max-width: 660px;
+  min-width: 0;
 }
 
 .header {
@@ -36,34 +35,8 @@
   font-size: 13px;
   font-weight: 700;
   padding: 0;
-}
-
-.infoBox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  margin-bottom: 18px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-}
-
-.infoBox span {
-  font-size: 22px;
-}
-
-.infoBox strong {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.infoBox p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 12px;
-  line-height: 1.45;
+  min-height: unset;
+  cursor: pointer;
 }
 
 .notificationsList {
@@ -75,6 +48,21 @@
   padding: 40px 16px;
   text-align: center;
   color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ── Right sidebar (suggested users) ── */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 72px;
+}
+
+@media (max-width: 1100px) {
+  .sidebar {
+    display: none;
+  }
 }
 
 @media (max-width: 1000px) {
@@ -89,13 +77,7 @@
     padding: 16px 12px 40px;
   }
 
-  .panel {
-    width: 100%;
-    margin: 0 auto;
-    position: static;
-    padding: 16px;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+  .sidebar {
+    display: none;
   }
 }

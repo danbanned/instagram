@@ -1,10 +1,10 @@
 .group {
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
 .groupTitle {
-  margin: 0 0 10px;
-  color: #262626;
+  margin: 12px 8px 4px;
+  color: var(--text-primary);
   font-size: 15px;
   font-weight: 700;
 }
