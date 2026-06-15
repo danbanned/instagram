@@ -163,8 +163,8 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .main-container {
   display: grid;
-  grid-template-columns: 72px 1fr 290px;
-  max-width: 1400px;
+  grid-template-columns: 72px 1fr 320px;
+  max-width: 975px;
   margin: 0 auto;
   gap: 0;
   padding: 0;
