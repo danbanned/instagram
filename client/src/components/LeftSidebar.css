@@ -30,7 +30,7 @@
 }
 
 .logo-icon {
-  font-size: 26px;
+  font-size: 30px;
   flex-shrink: 0;
   line-height: 1;
 }
@@ -65,10 +65,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 0;
+  padding: 12px 0;
   text-decoration: none;
   color: var(--text-primary);
-  border-radius: 8px;
+  border-radius: 10px;
   transition: background 0.15s;
   background: none;
   border: none;
@@ -81,7 +81,7 @@
 
 .left-sidebar:hover .nav-item {
   justify-content: flex-start;
-  padding: 10px 16px;
+  padding: 12px 16px;
   gap: 16px;
 }
 
@@ -93,8 +93,12 @@
   font-weight: 700;
 }
 
+.nav-item.active .nav-icon {
+  filter: drop-shadow(0 0 1px var(--text-primary));
+}
+
 .nav-icon {
-  font-size: 22px;
+  font-size: 27px;
   flex-shrink: 0;
   line-height: 1;
 }

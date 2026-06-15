@@ -158,6 +158,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .app-shell {
   min-height: 100vh;
   display: flex;
+  flex-direction: row;
 }
 
 .main-container {
