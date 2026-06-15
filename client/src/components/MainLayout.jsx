@@ -1,5 +1,6 @@
 import Navbar from './Navbar';
 import LeftSidebar from './LeftSidebar';
+import FloatingMessagesBox from './FloatingMessagesBox';
 import useAuth from '../hooks/useAuth';
 
 export default function MainLayout({ children }) {
@@ -14,6 +15,7 @@ export default function MainLayout({ children }) {
         
         {children}
       </div>
+      <FloatingMessagesBox />
     </div>
   );
 }
